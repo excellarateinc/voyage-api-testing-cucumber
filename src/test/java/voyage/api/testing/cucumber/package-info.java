@@ -16,23 +16,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package voyage.api.testing.cucumber;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 /**.
- * Spring boot application for Voyage test automation
+ * package info file
  * @version 1.0
  */
-@SpringBootApplication
-public class VoyageApiTestingCucumberApplication {
-
-    /**
-     * @param args arguments to spring boot application
-     */
-    public static void main(final String[] args) {
-        SpringApplication.run(VoyageApiTestingCucumberApplication.class, args);
-    }
-}
-
+package voyage.api.testing.cucumber;

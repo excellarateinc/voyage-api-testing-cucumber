@@ -1,29 +1,29 @@
 import org.springframework.boot.gradle.run.BootRunTask
 
 buildscript {
-	ext {
-		springBootVersion = '1.5.8.RELEASE'
-	}
-	repositories {
-		mavenCentral()
-		// Gradle Cucumber Plugin can be downloaded
+    ext {
+        springBootVersion = '1.5.8.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+        // Gradle Cucumber Plugin can be downloaded
         maven { url "https://plugins.gradle.org/m2/" }
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:" +
+                "${springBootVersion}")
         classpath("com.github.samueltbrown:gradle-cucumber-plugin:0.9")
         classpath("io.spring.gradle:dependency-management-plugin:0.6.1.RELEASE")
-	}
+    }
 }
 
 apply plugin: 'java'
-// dependency for Codenarc plugin
-apply plugin: 'groovy'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'com.github.samueltbrown.cucumber'
 apply plugin: 'io.spring.dependency-management'
-// Gradle Codenarc gets activated
-apply plugin: 'codenarc'
+apply plugin: 'checkstyle'
+apply plugin: 'pmd'
+apply plugin: 'findbugs'
 
 
 group = 'voyage-api-testing-cucumber'
@@ -32,8 +32,11 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
+
+def configDir = "${project.rootDir}/config"
+def reportsDir = "${project.buildDir}/reports"
 
 // ****************************************************************************
 // Project dependencies
@@ -41,25 +44,22 @@ repositories {
 
 dependencies {
     // Spring boot framework dependencies
-	compile('org.springframework.boot:spring-boot-starter-web')
-	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('org.springframework.boot:spring-boot-actuator-docs')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    compile('org.springframework.boot:spring-boot-actuator-docs')
 
-	// cucumber API's for your step implementations
+    // cucumber API's for your step implementations
     compile group: 'info.cukes', name: 'cucumber-java', version: '1.2.5'
-    compile group: 'info.cukes', name: 'cucumber-jvm', version: '1.2.5', ext: 'pom'
+    compile group: 'info.cukes', name: 'cucumber-jvm', version: '1.2.5', ext:
+            'pom'
     compile group: 'info.cukes', name: 'cucumber-junit', version: '1.2.5'
     compile group: 'info.cukes', name: 'cucumber-spring', version: '1.2.5'
 
-    // https://mvnrepository.com/artifact/org.codenarc/CodeNarc
-    compile group: 'org.codenarc', name: 'CodeNarc', version: '0.16'
-
-
     // Runtime dependencies
-	runtime('org.springframework.boot:spring-boot-devtools')
+    runtime('org.springframework.boot:spring-boot-devtools')
 
     // Testing dependencies
-	testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('info.cukes:cucumber-junit:1.2.5')
     testCompile('info.cukes:cucumber-jvm:1.2.5')
     testCompile('info.cukes:cucumber-java:1.2.5')
@@ -71,43 +71,54 @@ dependencies {
 // ****************************************************************************
 
 cucumber {
-	// generate cucumber reports
-	formats = ['pretty', 'json:build/cucumber/cucumber.json', 'junit:build/cucumber/cucumber.xml', 'html:build/cucumber/html']
-	// can run all features/scenarios except for those annotated with @Ignore
-	tags = ['~@Ignore']
+    // generate cucumber reports
+    formats = ['pretty', 'json:build/cucumber/cucumber.json',
+               'junit:build/cucumber/cucumber.xml', 'html:build/cucumber/html']
+    // can run all features/scenarios except for those annotated with @Ignore
+    tags = ['~@Ignore']
 }
 
-
 // ****************************************************************************
-// Codenarc Static Code Analysis plugin
+// checkstyle, findbugs, pmd code quality task when running from Gradle
 // ****************************************************************************
-codenarc {
-    toolVersion = "0.26.0"
 
-    codenarcMain {
-        ignoreFailures false
-        configFile file('codenarc/codenarc-main.rules')
-        reports {
-            xml.enabled = true
-            html.enabled = true
-        }
+task checkstyle(type: Checkstyle) {
+    configFile file("$configDir/checkstyle/checkstyle.xml")
+    configProperties.checkstyleSuppressionsPath =
+            file("$configDir/checkstyle/suppressions.xml").absolutePath
+    source 'src'
+    include '**/*.java'
+    exclude '**/gen/**'
+    classpath = files()
+}
 
-        maxPriority1Violations 0
-        maxPriority2Violations 0
-        maxPriority3Violations 0
-    }
-    codenarcTest {
-        ignoreFailures false
-        configFile file('codenarc/codenarc-test.rules')
-        reports {
-            xml.enabled = true
-            html.enabled = true
-        }
+// enable findbugs to run in test environment
+// task findbug(type: FindBugs) {
+//     excludeFilter = new File("$configDir/findbugs/findbugs-exclude-filter.xml")
+//     source 'src'
+//     include '**/*.java'
+//     exclude '**/gen/**'
+//     xml {
+//         destination "$reportsDir/findbugs/findbugs.xml"
+//     }
+//     html {
+//         destination "$reportsDir/findbugs/findbugs.html"
+//     }
+//     reports {
+//         xml.enabled false
+//         html.enabled true
+//         findbugsTest.enabled = true
+//     }
+//     classpath = files()
+// }
 
-        maxPriority1Violations 0
-        maxPriority2Violations 0
-        maxPriority3Violations 0
-    }
+findbugs {
+    findbugsTest.enabled = true
+}
+
+// enable PDM to run in test environment
+pmd {
+    pmdTest.enabled = true
 }
 
 // ****************************************************************************

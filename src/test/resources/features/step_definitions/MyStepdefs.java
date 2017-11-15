@@ -1,4 +1,6 @@
+
 /*
+ *
  * Copyright 2017 Lighthouse Software, Inc.   http://www.LighthouseSoftware.com
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -14,25 +16,24 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License.
+ *
  */
-package voyage.api.testing.cucumber;
+package features.step_definitions;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import cucumber.api.PendingException;
 
 /**.
- * Spring boot application for Voyage test automation
- * @version 1.0
+ * Created by susheel on 15/11/2017.
  */
-@SpringBootApplication
-public class VoyageApiTestingCucumberApplication {
-
-    /**
-     * @param args arguments to spring boot application
+public class VoyageAuthenticationTokenTestingStepdefs {
+    /**.
+     * step defs
      */
-    public static void main(final String[] args) {
-        SpringApplication.run(VoyageApiTestingCucumberApplication.class, args);
+    public VoyageAuthenticationTokenTestingStepdefs() {
+        Given("^a Oauth(\\d+) url \"([^\"]*)\"$", (Integer arg0, String arg1)
+                -> {
+            // Write code here that turns the phrase above into concrete actions
+            throw new PendingException();
+        });
     }
 }
-
