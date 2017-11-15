@@ -57,6 +57,7 @@ dependencies {
 
     // Runtime dependencies
     runtime('org.springframework.boot:spring-boot-devtools')
+    runtime fileTree(dir: 'libs', include: '*.jar')
 
     // Testing dependencies
     testCompile('org.springframework.boot:spring-boot-starter-test')
@@ -92,33 +93,42 @@ task checkstyle(type: Checkstyle) {
     classpath = files()
 }
 
-// enable findbugs to run in test environment
-// task findbug(type: FindBugs) {
-//     excludeFilter = new File("$configDir/findbugs/findbugs-exclude-filter.xml")
-//     source 'src'
-//     include '**/*.java'
-//     exclude '**/gen/**'
-//     xml {
-//         destination "$reportsDir/findbugs/findbugs.xml"
-//     }
-//     html {
-//         destination "$reportsDir/findbugs/findbugs.html"
-//     }
-//     reports {
-//         xml.enabled false
-//         html.enabled true
-//         findbugsTest.enabled = true
-//     }
-//     classpath = files()
-// }
-
+// ****************************************************************************
+// enable findbugs
+// ****************************************************************************
 findbugs {
     findbugsTest.enabled = true
+    sourceSets = [sourceSets.main]
+    reportsDir = file("$project.buildDir/reports/findbugs")
+    effort = "max"
+    excludeFilter =
+            file("$configDir/findbugs/findbugs.xml")
 }
 
-// enable PDM to run in test environment
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}
+
+// ****************************************************************************
+// enable PDM
+// ****************************************************************************
 pmd {
     pmdTest.enabled = true
+    sourceSets = [sourceSets.main]
+    reportsDir = file("$project.buildDir/reports/pmd")
+    ruleSets = []
+    ruleSetFiles = files('config/pmd/tailorRuleSet.xml')
+}
+
+tasks.withType(Pmd) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+
 }
 
 // ****************************************************************************
