@@ -21,79 +21,88 @@
 package com.lssinc.voyage.api.cucumber.test;
 
 import cucumber.api.PendingException;
+import cucumber.api.CucumberOptions;
 
 /**.
  *
  */
 public class VoyageAuthenticationTokenTestingSteps {
     /**
-     *  step definitions for voyage authenticaion by using requesting
-     *  authenticatoin token from voyage api
+     * step definitions for voyage authenticaion by using requesting
+     * authenticatoin token from voyage api
      */
     public VoyageAuthenticationTokenTestingSteps() {
-        @Given("^a Oauth(\\d+) url \"([^\"]*)\"$")
-        public void a_Oauth_url(int arg1, String arg2) throws Throwable {
-            // Write code here that turns the phrase above into concrete actions
-            throw new PendingException();
-        }
 
-        @Given("^with token name 'Voyage SUPER'$")
-        public void with_token_name_Voyage_SUPER() throws Throwable {
-            // Write code here that turns the phrase above into concrete actions
-            throw new PendingException();
-        }
+    }
 
-        @Given("^with Client ID 'client-super'$")
-        public void with_Client_ID_client_super() throws Throwable {
-            // Write code here that turns the phrase above into concrete actions
-            throw new PendingException();
-        }
+    @Given("^a Oauth(\\d+) url \"([^\"]*)\"$")
+    public void a_Oauth_url ( int arg1, String arg2) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
 
-        @Given("^with Client Secret 'secret'$")
-        public void with_Client_Secret_secret() throws Throwable {
-            // Write code here that turns the phrase above into concrete actions
-            throw new PendingException();
-        }
+    @Given("^with token name 'Voyage SUPER'$")
+    public void with_token_name_Voyage_SUPER () throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
 
-        @Given("^with Grant Type 'client_credentials'$")
-        public void with_Grant_Type_client_credentials() throws Throwable {
-            // Write code here that turns the phrase above into concrete actions
-            throw new PendingException();
-        }
+    @Given("^with Client ID 'client-super'$")
+    public void with_Client_ID_client_super () throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
 
-        @When("^I request the Oauth(\\d+) token form of this url$")
-        public void i_request_the_Oauth_token_form_of_this_url(int arg1) throws Throwable {
-            // Write code here that turns the phrase above into concrete actions
-            throw new PendingException();
-        }
+    @Given("^with Client Secret 'secret'$")
+    public void with_Client_Secret_secret () throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
 
-        @Then("^I should obtain the following JSON message \"([^\"]*)\"$")
-        public void i_should_obtain_the_following_JSON_message(String arg1) throws Throwable {
-            // Write code here that turns the phrase above into concrete actions
-            throw new PendingException();
-        }
+    @Given("^with Grant Type 'client_credentials'$")
+    public void with_Grant_Type_client_credentials () throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
 
-        @Given("^an access_token \"([^\"]*)\"$")
-        public void an_access_token(String arg1) throws Throwable {
-            // Write code here that turns the phrase above into concrete actions
-            throw new PendingException();
-        }
+    @When("^I request the Oauth(\\d+) token form of this url$")
+    public void i_request_the_Oauth_token_form_of_this_url ( int arg1) throws
 
-        @Given("^with \"([^\"]*)\"$")
-        public void with(String arg1) throws Throwable {
-            // Write code here that turns the phrase above into concrete actions
-            throw new PendingException();
-        }
+                                                                       Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
 
-        @When("^I request the login through JWT token$")
-        public void i_request_the_login_through_JWT_token() throws Throwable {
-            // Write code here that turns the phrase above into concrete actions
-            throw new PendingException();
-        }
+    @Then("^I should obtain the following JSON message \"([^\"]*)\"$")
+    public void i_should_obtain_the_following_JSON_message (String arg1)
+            throws
+            Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
 
-        @Then("^I should get a failed loggin message \"([^\"]*)\"$")
-        public void i_should_get_a_failed_loggin_message(String arg1) throws Throwable {
-            // Write code here that turns the phrase above into concrete actions
-            throw new PendingException();
-        }
+    @Given("^an access_token \"([^\"]*)\"$")
+    public void an_access_token (String arg1) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Given("^with \"([^\"]*)\"$")
+    public void with (String arg1) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @When("^I request the login through JWT token$")
+    public void i_request_the_login_through_JWT_token () throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Then("^I should get a failed loggin message \"([^\"]*)\"$")
+    public void i_should_get_a_failed_loggin_message (String arg1) throws
+                                                                   Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
 }

@@ -27,14 +27,15 @@ import org.junit.runner.RunWith;
 import org.springframework.stereotype.Component;
 
 /**.
- *  Cucumber Runner will run the cucumber integration tests, it adds as a
- *  hooks to control the test case execution
+ * Cucumber Runner will run the cucumber integration tests, it adds as a
+ * hooks to control the test case execution
  */
 @Component
 @RunWith(Cucumber.class)
 @CucumberOptions(format = {"pretty", "html:target/cucumber"},
         features = "src/test/resources/features",
-        glue = {"com.lssinc.voyage.api.cucumber.test"})
+        glue = {"com.lssinc.voyage.api.cucumber.test"}, dryRun = false,
+        monochrome = true)
 public class CucumberRunner {
 
 }
