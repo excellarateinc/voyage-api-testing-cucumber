@@ -65,11 +65,17 @@ dependencies {
     testCompile('info.cukes:cucumber-jvm:1.2.5')
     testCompile('info.cukes:cucumber-java:1.2.5')
     testCompile('info.cukes:cucumber-spring:1.2.5')
+    testCompile('junit:junit:4.12')
 }
 
 // ****************************************************************************
 // Cucumber configuration
 // ****************************************************************************
+configurations {
+    cucumberRuntime {
+        extendsFrom testRuntime
+    }
+}
 
 cucumber {
     // generate cucumber reports

@@ -74,7 +74,7 @@
 
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
 
-        <module name="JavadocMethod"/>
+        <!-- <module name="JavadocMethod"/> -->
 
         <module name="JavadocType"/>
 
@@ -95,7 +95,7 @@
 
         <module name="MemberName"/>
 
-        <module name="MethodName"/>
+        <!--<module name="MethodName"/>-->
 
         <module name="PackageName"/>
 
@@ -255,7 +255,7 @@
 
         <module name="ArrayTypeStyle"/>
 
-        <module name="FinalParameters"/>
+        <!--<module name="FinalParameters"/> -->
 
         <!-- <module name="TodoComment"/> -->
 
@@ -267,9 +267,9 @@
         <property name="max" value="80"/>
     </module> -->
     <!-- Javadoc Comments -->
-    <module name="JavadocPackage">
+  <!--  <module name="JavadocPackage">
         <property name="allowLegacy" value="false"/>
-    </module>
+    </module>-->
 
 
 </module>

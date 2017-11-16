@@ -16,11 +16,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package voyage.api.testing.cucumber;
+package com.lssinc.voyage.api.cucumber.test;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**.
@@ -30,7 +29,6 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @version 1.0
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
 public class VoyageApiTestingCucumberApplicationTests {
 
     /**.
