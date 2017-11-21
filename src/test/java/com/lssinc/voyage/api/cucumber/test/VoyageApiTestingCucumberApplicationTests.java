@@ -19,8 +19,11 @@
 package com.lssinc.voyage.api.cucumber.test;
 
 import org.junit.Test;
+import org.junit.runner.Computer;
+import org.junit.runner.JUnitCore;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
+import voyage.api.cucumber.CucumberRunner;
 
 /**.
  *
@@ -37,6 +40,10 @@ public class VoyageApiTestingCucumberApplicationTests {
      */
     @Test
     public void contextLoads() {
+        Computer computer = new Computer();
+        JUnitCore jUnitCore = new JUnitCore();
+        jUnitCore.run(computer, CucumberRunner.class);
+        //System.out.println(runner.hashCode());
     }
 
 }

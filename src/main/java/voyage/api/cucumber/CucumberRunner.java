@@ -24,6 +24,7 @@ package voyage.api.cucumber;
 import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
 import org.junit.runner.RunWith;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 /**.
@@ -34,9 +35,12 @@ import org.springframework.stereotype.Component;
 @RunWith(Cucumber.class)
 @CucumberOptions(format = {"pretty", "html:target/cucumber"},
         features = "src/test/resources/features",
-        glue = {"com.lssinc.voyage.api.cucumber.test"}, dryRun = false,
-        monochrome = true)
+        glue = "voyage.api.cucumber",
+        dryRun = false)
+@PropertySource(value= {"classpath:application.yml"})
 public class CucumberRunner {
+    public CucumberRunner() {
 
+    }
 }
 

@@ -47,6 +47,11 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-actuator')
     compile('org.springframework.boot:spring-boot-actuator-docs')
+    compile('org.springframework.boot:spring-boot-starter-test')
+    compile group: 'org.springframework.boot', name: 'spring-boot-test',
+            version: '1.4.0.RELEASE'
+    compile group: 'org.springframework', name: 'spring-context', version:
+            '4.3.12.RELEASE'
 
     // cucumber API's for your step implementations
     compile group: 'info.cukes', name: 'cucumber-java', version: '1.2.5'
@@ -54,19 +59,34 @@ dependencies {
             'pom'
     compile group: 'info.cukes', name: 'cucumber-junit', version: '1.2.5'
     compile group: 'info.cukes', name: 'cucumber-spring', version: '1.2.5'
+    compile group: 'info.cukes', name: 'cucumber-junit', version: '1.2.5'
+
 
     // Runtime dependencies
     runtime('org.springframework.boot:spring-boot-devtools')
+    runtime('org.springframework.boot:spring-boot-starter-test')
+    runtime group: 'org.springframework', name: 'spring-context', version: '4' +
+            '.3.12.RELEASE'
+    runtime('junit:junit:4.12')
     runtime fileTree(dir: 'libs', include: '*.jar')
+    runtime group: 'info.cukes', name: 'cucumber-junit', version: '1.2.5'
 
     // Testing dependencies
-    testCompile('org.springframework.boot:spring-boot-starter-test')
+    //testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile group: 'org.springframework.boot', name:
+            'spring-boot-starter-test', version: '1.5.8.RELEASE'
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-test',
+            version: '1.4.0.RELEASE'
     testCompile('info.cukes:cucumber-junit:1.2.5')
     testCompile('info.cukes:cucumber-jvm:1.2.5')
     testCompile('info.cukes:cucumber-java:1.2.5')
     testCompile('info.cukes:cucumber-spring:1.2.5')
     testCompile('junit:junit:4.12')
+    testCompile group: 'info.cukes', name: 'cucumber-junit', version: '1.2.5'
+
+
 }
+
 
 // ****************************************************************************
 // Cucumber configuration
