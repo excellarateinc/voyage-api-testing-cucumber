@@ -19,8 +19,8 @@
 
 package com.lssinc.voyage.api.cucumber;
 
-import com.lssinc.voyage.api.cucumber.util.Util.Utils;
-import com.lssinc.voyage.api.cucumber.util.Util.VoyageConstants;
+import com.lssinc.voyage.api.cucumber.util.Utils;
+import com.lssinc.voyage.api.cucumber.util.VoyageConstants;
 import com.sun.glass.ui.Application;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
