@@ -16,29 +16,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.lssinc.voyage.api.cucumber;
-
-import cucumber.api.CucumberOptions;
-import cucumber.api.junit.Cucumber;
-import org.junit.runner.RunWith;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.stereotype.Component;
-
 /**.
- * Cucumber Runner will run the cucumber integration tests, it adds as a
- * hooks to control the test case execution
+ * package info file
+ * @version 1.0
  */
-@Component
-@RunWith(Cucumber.class)
-@CucumberOptions(format = {"pretty", "html:target/cucumber"},
-        features = "src/test/resources/features",
-        glue = "com.lssinc.voyage.api.cucumber",
-        dryRun = false)
-@PropertySource(value = {"classpath:application.yml"})
-public class CucumberRunner {
-    public CucumberRunner() {
-
-    }
-}
-
+package com.lssinc.voyage.api.cucumber;

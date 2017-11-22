@@ -34,7 +34,9 @@
     <description>
         Performs PMD checks for Tailor code style
     </description>
-    <rule ref="rulesets/java/basic.xml"/>
+    <rule ref="rulesets/java/basic.xml">
+        <exclude name="ReturnFromFinallyBlock"/>
+    </rule>
     <rule ref="rulesets/java/braces.xml"/>
     <rule ref="rulesets/java/imports.xml">
         <exclude name="TooManyStaticImports"/>
@@ -45,6 +47,6 @@
         <exclude name="TestClassWithoutTestCases"/>
         <exclude name="JUnitTestsShouldIncludeAssert"/>
     </rule>
-    <rule ref="rulesets/java/strictexception.xml"/>
-    <rule ref="rulesets/java/typeresolution.xml"/>
+    <!--<rule ref="rulesets/java/strictexception.xml"/>-->
+    <!--<rule ref="rulesets/java/typeresolution.xml"/>-->
 </ruleset>

@@ -29,12 +29,12 @@ import com.lssinc.voyage.api.cucumber.CucumberRunner;
 @Service
 public class CucumberRunnerService {
 
-    /**
+    /**.
      *  voyage authentication token runner, it runs integrated test cases
      *  related to authentication token generation
      * @throws Exception if unable to generate a token
      */
-    public void voyageApiAuthenticationRunner() throws Exception{
+    public void voyageApiAuthenticationRunner() throws Exception {
 
         try {
             Computer computer = new Computer();

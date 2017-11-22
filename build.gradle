@@ -128,7 +128,7 @@ findbugs {
     reportsDir = file("$project.buildDir/reports/findbugs")
     effort = "max"
     excludeFilter =
-            file("$configDir/findbugs/findbugs.xml")
+            file("$configDir/findbugs/findbugs-include.xml")
 }
 
 tasks.withType(FindBugs) {
