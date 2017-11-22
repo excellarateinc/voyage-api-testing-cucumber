@@ -17,8 +17,10 @@
  * limitations under the License.
  */
 
-package voyage.api.cucumber;
+package com.lssinc.voyage.api.cucumber;
 
+import com.lssinc.voyage.api.cucumber.util.Util.Utils;
+import com.lssinc.voyage.api.cucumber.util.Util.VoyageConstants;
 import com.sun.glass.ui.Application;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
@@ -43,8 +45,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
-import voyage.api.cucumber.util.Util.Utils;
-import voyage.api.cucumber.util.Util.VoyageConstants;
 
 import java.net.URI;
 import java.util.HashMap;

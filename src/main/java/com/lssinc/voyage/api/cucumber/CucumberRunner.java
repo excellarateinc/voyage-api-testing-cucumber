@@ -16,34 +16,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lssinc.voyage.api.cucumber.test;
 
-import org.junit.Test;
-import org.junit.runner.Computer;
-import org.junit.runner.JUnitCore;
+package com.lssinc.voyage.api.cucumber;
+
+import cucumber.api.CucumberOptions;
+import cucumber.api.junit.Cucumber;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
-import com.lssinc.voyage.api.cucumber.CucumberRunner;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 
 /**.
- *
- * Voyage api testing class
- *
- * @version 1.0
+ * Cucumber Runner will run the cucumber integration tests, it adds as a
+ * hooks to control the test case execution
  */
-@RunWith(SpringRunner.class)
-public class VoyageApiTestingCucumberApplicationTests {
+@Component
+@RunWith(Cucumber.class)
+@CucumberOptions(format = {"pretty", "html:target/cucumber"},
+        features = "src/test/resources/features",
+        glue = "com.lssinc.voyage.api.cucumber",
+        dryRun = false)
+@PropertySource(value= {"classpath:application.yml"})
+public class CucumberRunner {
+    public CucumberRunner() {
 
-    /**.
-     *
-     * context load test
-     */
-    @Test
-    public void contextLoads() {
-        Computer computer = new Computer();
-        JUnitCore jUnitCore = new JUnitCore();
-        jUnitCore.run(computer, CucumberRunner.class);
-        //System.out.println(runner.hashCode());
     }
-
 }
+

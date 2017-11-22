@@ -16,8 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package voyage.api.cucumber.util.Util;
+package com.lssinc.voyage.api.cucumber.util.Util;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

@@ -16,13 +16,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package voyage.api.cucumber.voyage.api.cucumber.service;
+package com.lssinc.voyage.api.cucumber.voyage.api.cucumber.service;
 
 import org.junit.runner.Computer;
 import org.junit.runner.JUnitCore;
 import org.springframework.stereotype.Service;
-import voyage.api.cucumber.CucumberRunner;
+import com.lssinc.voyage.api.cucumber.CucumberRunner;
 
 /**.
  *  cucumber runner service runs the specific cucumber integration test
