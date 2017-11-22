@@ -10,12 +10,6 @@ Voyage REST API integration testing framework based on Cucumber and Java Spring 
 <pre>
 +---.idea
 +---src
-|   +---cucumber
-|   |   |---main
-|   |   |   |---resources
-|   |   |   |   \--voyage.sample.featurefile
-|   |   |   +---stepdefinitions
-|   |   |   |   \--VoyageStepDefinition(s).step
 |   +---main
 |   |   +---java
 |   |   |   \---voyage.api.testing.cucumber
