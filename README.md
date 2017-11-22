@@ -19,19 +19,26 @@ Voyage REST API integration testing framework based on Cucumber and Java Spring 
 |   +---main
 |   |   +---java
 |   |   |   \---voyage.api.testing.cucumber
-|   |   |   |   \--VoyageAPITestingController.java
+|   |   |   |   |---voyage.api.testing.cucumber.controller
+|   |   |   |   |   \---VoyageApiTestingController.java
+|   |   |   |   |---voyage.api.testing.cucumber.util
+|   |   |   |   |   \---Utils.java
+|   |   |   |   |   \---VoyageConstants.java
+|   |   |   |   |---voyage.api.testing.cucumber.service
+|   |   |   |   |   \---CucumberRunnerService.java
+|   |   |   |   \---CucumberRunner.java
+|   |   |   |   \---package-info.java
 |   |   |   |   \--VoyageApiTestingCucumberApplication.java
+|   |   |   |   \--VoyageApplicationAuthenticationStepdefs.step
 |   |   +---resources
 |   |   |   \--application.yml
 |   +---test
 |   |   +---java
-|   |   |   +---voyage.api.testing.cucumber
+|   |   |   +---com.lssinc.voyage.api.cucumber.test
 |   |   |   |   \--VoyageApiTestingCucumberApplicationTests.java
 |   |   +---resources
-|   |   |   +---stepdefinitions
-|   |   |   |   \--VoyageAuthenticationTokenStepDefinition(s).step
 |   |       +---features
-|   |           |---VoyageAuthenticationToken.feature
+|   |   |   |   |---VoyageAuthenticationToken.feature
 </pre>
 
 #####2. Install dependencies
@@ -60,13 +67,137 @@ from the browser Run this:
 
     http://localhost:8083/api/v1/automation/generatetoken
 
-You should get a static responce
-
-    {
-       "access_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkIjoxNTEwNTg0NDkzMjU0LCJzY29wZSI6WyJSZWFkIERhdGEiLCJXcml0ZSBEYXRhIl0sImV4cCI6MTUxMDU5MTY5MywiYXV0aG9yaXRpZXMiOlsiYXBpLnBlcm1pc3Npb25zLmRlbGV0ZSIsImFwaS5yb2xlcy5kZWxldGUiLCJhcGkucm9sZXMudXBkYXRlIiwiYXBpLnBlcm1pc3Npb25zLmxpc3QiLCJhcGkucGVybWlzc2lvbnMudXBkYXRlIiwiYXBpLnVzZXJzLmNyZWF0ZSIsImFwaS51c2Vycy5nZXQiLCJhcGkudXNlcnMubGlzdCIsImFwaS5wZXJtaXNzaW9ucy5nZXQiLCJhcGkucm9sZXMuZ2V0IiwiYXBpLnVzZXJzLnVwZGF0ZSIsImFwaS5yb2xlcy5jcmVhdGUiLCJhcGkudXNlcnMuZGVsZXRlIiwiYXBpLnBlcm1pc3Npb25zLmNyZWF0ZSIsImFwaS5yb2xlcy5saXN0Il0sImp0aSI6IjhlMDU2MmU4LTY0YzEtNDk2Yi04OTViLWU2ZWY4OTNkMDNhOCIsImNsaWVudF9pZCI6ImNsaWVudC1zdXBlciJ9.o2SnZRPe0cv08IcreoXXhcESuA-QIPhyO9FEqOUcjSK37pdCwVhfbsS877zaoA4i5tQ4iAQ49vMy5Ag7tn300Zw4QwXsRRzOpfeo50XeUOJAobMJwa-MpIgKd4jGqpjsKQbnI2oKOs_CBW5G63qWCdLYzi8AYvO1cTVFDzD2D0Yg_Rc9iF4XvA32URgi0LQTni8OxM_dn5nHHr53WbFy3EdJvRZN60LCX9sUHCKYVkpmJ_oY4iIqouXGUC8W0q91u4alejzTIDIFYeNdI1GyssK1DuAFvsR032KWHjpNraGeFzfgK8vdgUOPrSquZIJ2dSuSsMM10Be3hv43CPR9Pg",
-       "token_type":"bearer",
-       "expires_in":7199,
-       "scope":"Read Data Write Data",
-       "created":1510584493254,
-       "jti":"8e0562e8-64c1-496b-895b-e6ef893d03a8"
-    }
+You should get an example responce
+<pre>
+[
+  {
+    "line": 1,
+    "elements": [
+      {
+        "line": 6,
+        "name": "getting Oauth2 Token",
+        "description": "",
+        "id": "specflowfeatureoauth2tokenrequest;getting-oauth2-token",
+        "type": "scenario",
+        "keyword": "Scenario",
+        "steps": [
+          {
+            "result": {
+              "status": "undefined"
+            },
+            "line": 7,
+            "name": "a Oauth2 url \"http://localhost:8080/oauth/token\"",
+            "match": {},
+            "keyword": "Given "
+          },
+          {
+            "result": {
+              "status": "undefined"
+            },
+            "line": 8,
+            "name": "with token name \u0027Voyage SUPER\u0027",
+            "match": {},
+            "keyword": "And "
+          },
+          {
+            "result": {
+              "status": "undefined"
+            },
+            "line": 9,
+            "name": "with Client ID \u0027client-super\u0027",
+            "match": {},
+            "keyword": "And "
+          },
+          {
+            "result": {
+              "status": "undefined"
+            },
+            "line": 10,
+            "name": "with Client Secret \u0027secret\u0027",
+            "match": {},
+            "keyword": "And "
+          },
+          {
+            "result": {
+              "status": "undefined"
+            },
+            "line": 11,
+            "name": "with Grant Type \u0027client_credentials\u0027",
+            "match": {},
+            "keyword": "And "
+          },
+          {
+            "result": {
+              "status": "undefined"
+            },
+            "line": 12,
+            "name": "I request the Oauth2 token form of this url",
+            "match": {},
+            "keyword": "When "
+          },
+          {
+            "result": {
+              "status": "undefined"
+            },
+            "line": 13,
+            "name": "I should obtain the following JSON message \"Successful\"",
+            "match": {},
+            "keyword": "Then "
+          }
+        ]
+      },
+      {
+        "line": 15,
+        "name": "invalid JWT Token",
+        "description": "",
+        "id": "specflowfeatureoauth2tokenrequest;invalid-jwt-token",
+        "type": "scenario",
+        "keyword": "Scenario",
+        "steps": [
+          {
+            "result": {
+              "status": "undefined"
+            },
+            "line": 16,
+            "name": "an access_token \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkIjoxNTEwMjMwNDIzOTE4LCJzY29wZSI6WyJSZWFkIERhdGEiLCJXcml0ZSBEYXRhIl0sImV4cCI6MTUxMDIzNzYyMywiYXV0aG9yaXRpZXMiOlsiYXBpLnBlcm1pc3Npb25zLmRlbGV0ZSIsImFwaS5yb2xlcy5kZWxldGUiLCJhcGkucm9sZXMudXBkYXRlIiwiYXBpLnBlcm1pc3Npb25zLmxpc3QiLCJhcGkucGVybWlzc2lvbnMudXBkYXRlIiwiYXBpLnVzZXJzLmNyZWF0ZSIsImFwaS51c2Vycy5nZXQiLCJhcGkudXNlcnMubGlzdCIsImFwaS5wZXJtaXNzaW9ucy5nZXQiLCJhcGkucm9sZXMuZ2V0IiwiYXBpLnVzZXJzLnVwZGF0ZSIsImFwaS5yb2xlcy5jcmVhdGUiLCJhcGkudXNlcnMuZGVsZXRlIiwiYXBpLnBlcm1pc3Npb25zLmNyZWF0ZSIsImFwaS5yb2xlcy5saXN0Il0sImp0aSI6IjM1ZmMzNjM1LWUyNmMtNDUwMi05OTMyLTNmMDhlOTQwZGQzNiIsImNsaWVudF9pZCI6ImNsaWVudC1zdXBlciJ9.gBgsG5lho32ulgOikpr31yMXbM2vQ_MZQUmfPRdAHF8HkuL23qW8cBb-64vBkFGvyvT6OkofmCsBNfnLSfkEHqClaKoOb2wPQhlOnJfLnI7F85zh_SaHTyN1zGPOx3j3EhxCjxir5d8DGVCeqgVB8JoonaTqd5O3-v4xiYplKE0qRQZyuqQuGjeIUOIrhwMfPkyZyZuQs-BhnpidKeDL1fGa5BRtcTXvurbVchz2ex_C4HQgTZe8E7zfloYwBmmKUUi7HPe-zS98U5uBXlLGodXZnM-gkzqvYEMEhPoIIKe_CXnwgEof0b2ENqK8325_KcJ_iirKK3keyJveZmpT3g\"",
+            "match": {},
+            "keyword": "Given "
+          },
+          {
+            "result": {
+              "status": "undefined"
+            },
+            "line": 17,
+            "name": "with \"http://localhost:8080/api/v1/statuses\"",
+            "match": {},
+            "keyword": "And "
+          },
+          {
+            "result": {
+              "status": "undefined"
+            },
+            "line": 18,
+            "name": "I request the login through JWT token",
+            "match": {},
+            "keyword": "When "
+          },
+          {
+            "result": {
+              "status": "undefined"
+            },
+            "line": 19,
+            "name": "I should get a failed login message \"The remote server returned an error: (401) Unauthorized.\"",
+            "match": {},
+            "keyword": "Then "
+          }
+        ]
+      }
+    ],
+    "name": "SpecFlowFeatureOauth2TokenRequest",
+    "description": "In order to authenticate a user\r\nAs a user of voyage application\r\nI want to be able to access resource based on my access permissions",
+    "id": "specflowfeatureoauth2tokenrequest",
+    "keyword": "Feature",
+    "uri": "features/VoyageAuthenticationToken.feature"
+  }
+]
+</pre>
