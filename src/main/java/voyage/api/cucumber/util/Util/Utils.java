@@ -48,8 +48,8 @@ public class Utils {
 
         HttpHeaders headers =
                 buildBasicAuthenticationHttpHeader(
-                        propertiesMap.get(VoyageConstants.USER).toString(),
-                        propertiesMap.get(VoyageConstants.PASSWORD).toString());
+                        propertiesMap.get(VoyageConstants.VOYAGE_API_USER).toString(),
+                        propertiesMap.get(VoyageConstants.VOYAGE_API_USER_PASSWORD).toString());
         HttpEntity httpEntity = buildRequestBody(headers, propertiesMap);
         return httpEntity;
     }
@@ -81,14 +81,14 @@ public class Utils {
                                        Map propertiesMap) {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<String,
                 String>();
-        body.add(propertiesMap.get(VoyageConstants.CLIENT_ID).toString(),
-                propertiesMap.get(VoyageConstants.CLIENT_ID_VALUE).toString());
-        body.add(propertiesMap.get(VoyageConstants.CLIENT_SECRET).toString(),
-                propertiesMap.get(VoyageConstants.CLIENT_SECRET_VALUE)
+        body.add(propertiesMap.get(VoyageConstants.VOYAGE_API_CLIENT_ID).toString(),
+                propertiesMap.get(VoyageConstants.VOYAGE_API_CLIENT_ID_VALUE).toString());
+        body.add(propertiesMap.get(VoyageConstants.VOYAGE_API_CLIENT_SECRET).toString(),
+                propertiesMap.get(VoyageConstants.VOYAGE_API_CLIENT_SECRET_VALUE)
                 .toString());
-        body.add(propertiesMap.get(VoyageConstants.GRANT_TYPE).toString(),
-                propertiesMap.get(VoyageConstants.GRANT_TYPE_VALUE).toString());
-        body.add(propertiesMap.get(VoyageConstants.SCOPE).toString(), "");
+        body.add(propertiesMap.get(VoyageConstants.VOYAGE_API_GRANT_TYPE).toString(),
+                propertiesMap.get(VoyageConstants.VOYAGE_API_GRANT_TYPE_VALUE).toString());
+        body.add(propertiesMap.get(VoyageConstants.REQUEST_SCOPE).toString(), "");
 
         HttpEntity<?> httpEntity = new HttpEntity<Object>(body, headers);
 
@@ -105,7 +105,7 @@ public class Utils {
             String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(VoyageConstants.AUTHORIZATION, VoyageConstants.BEARER_TOKEN + accessToken);
+        headers.set(VoyageConstants.AUTHORIZATION_SCHEME, VoyageConstants.BEARER_TOKEN + accessToken);
         return headers;
     }
 }

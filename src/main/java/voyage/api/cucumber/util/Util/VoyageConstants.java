@@ -28,47 +28,47 @@ public class VoyageConstants {
     /**
      * claim id header constant
      */
-    public static final String CLIENT_ID = "clientId";
+    public static final String VOYAGE_API_CLIENT_ID = "clientId";
     /**
      *  claim id header value
      */
-    public static final String CLIENT_ID_VALUE = "clientIdValue";
+    public static final String VOYAGE_API_CLIENT_ID_VALUE = "clientIdValue";
     /**
      *  client secret header constant
      */
-    public static final String CLIENT_SECRET = "clientSecret";
+    public static final String VOYAGE_API_CLIENT_SECRET = "clientSecret";
     /**
      * client secret header value
      */
-    public static final String CLIENT_SECRET_VALUE = "clientSecretValue";
+    public static final String VOYAGE_API_CLIENT_SECRET_VALUE = "clientSecretValue";
     /**
      * grant type header constant
      */
-    public static final String GRANT_TYPE = "grantType";
+    public static final String VOYAGE_API_GRANT_TYPE = "grantType";
     /**
      * grant type header value
      */
-    public  static final String GRANT_TYPE_VALUE = "grantTypeValue";
+    public  static final String VOYAGE_API_GRANT_TYPE_VALUE = "grantTypeValue";
     /**
      * scope header constant
      */
-    public static final String SCOPE = "scope";
+    public static final String REQUEST_SCOPE = "scope";
     /**
      * user name header constant
      */
-    public static final String USER = "user";
+    public static final String VOYAGE_API_USER = "user";
     /**
      * password header constant
      */
-    public static final String PASSWORD = "password";
+    public static final String VOYAGE_API_USER_PASSWORD = "password";
     /**
      * fully qualified OAuth Token url
      */
-    public static final String OAUTH_TOKEN_URL = "oAuthTokenUrl";
+    public static final String VOYAGE_API_OAUTH_TOKEN_URL = "oAuthTokenUrl";
     /**
      *  Authorization header constant
      */
-    public static final String AUTHORIZATION = "Authorization";
+    public static final String AUTHORIZATION_SCHEME = "Authorization";
     /**
      *  Bearer token constant
      */

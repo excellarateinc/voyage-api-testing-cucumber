@@ -27,13 +27,11 @@ import cucumber.api.java.en.When;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -60,11 +58,9 @@ import java.util.Map;
 @ContextConfiguration(classes = VoyageApiTestingCucumberApplication.class,
         loader = SpringApplicationContextLoader.class)
 @WebAppConfiguration
-//@IntegrationTest
-//@PropertySource(value = "classpath:application.yml")
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest
         .WebEnvironment.RANDOM_PORT)
-public class VoyageApplicationAuthenticaionStepdefs {
+public class VoyageApplicationAuthenticationStepdefs {
 
     /**
      * OK message for verifying against the successful response
@@ -96,13 +92,6 @@ public class VoyageApplicationAuthenticaionStepdefs {
      */
     @Autowired
     private Environment environment;
-
-
-    /**
-     *
-     */
-    @Autowired
-    private PropertyLoader prop;
 
     /**
      *  oauth2TokenSuccessMessage is used to verifying steps to successful
@@ -153,13 +142,23 @@ public class VoyageApplicationAuthenticaionStepdefs {
 
     @When("^I request the 'Oauth(\\d+)' token form of this url$")
     public void iRequestTheOauthTokenFormOfThisUrl(int arg0) throws Throwable {
-        ResponseEntity response =  getAuthToken();
+        ResponseEntity response = null;
+        try {
+            response =  getAuthToken();
+        } catch (Exception e){
+            Assert.fail();
+            throw e;
+        }
         Assert.assertNotNull(response);
         Assert.assertTrue(response.toString().startsWith(OK_200));
         oauth2TokenSuccessMessage = HttpStatus.OK.toString();
     }
 
-    private ResponseEntity getAuthToken() {
+    /**
+     *
+     * @return response entity of successful generated token
+     */
+    private ResponseEntity getAuthToken() throws Exception {
         ResponseEntity<String> response = null;
         // loading the properties from the property loader into the variables
         // required for generating OAuth Token
@@ -184,18 +183,18 @@ public class VoyageApplicationAuthenticaionStepdefs {
                 "voyagestepdef.granttypevalue");
 
         Map<String, String> propertiesMap = new HashMap<String, String>();
-        propertiesMap.put(VoyageConstants.USER, user);
-        propertiesMap.put(VoyageConstants.PASSWORD, password);
-        propertiesMap.put(VoyageConstants.CLIENT_ID, clientId);
-        propertiesMap.put(VoyageConstants.CLIENT_ID_VALUE, clientIdValue);
-        propertiesMap.put(VoyageConstants.PASSWORD, clientSecret);
-        propertiesMap.put(VoyageConstants.CLIENT_SECRET, clientSecret);
-        propertiesMap.put(VoyageConstants.CLIENT_SECRET_VALUE,
+        propertiesMap.put(VoyageConstants.VOYAGE_API_USER, user);
+        propertiesMap.put(VoyageConstants.VOYAGE_API_USER_PASSWORD, password);
+        propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_ID, clientId);
+        propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_ID_VALUE, clientIdValue);
+        propertiesMap.put(VoyageConstants.VOYAGE_API_USER_PASSWORD, clientSecret);
+        propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_SECRET, clientSecret);
+        propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_SECRET_VALUE,
                 clientSecretValue);
-        propertiesMap.put(VoyageConstants.GRANT_TYPE, grantType);
-        propertiesMap.put(VoyageConstants.GRANT_TYPE_VALUE, grantTypeValue);
-        propertiesMap.put(VoyageConstants.SCOPE, "");
-        propertiesMap.put(VoyageConstants.OAUTH_TOKEN_URL, oAuthTokenUrl);
+        propertiesMap.put(VoyageConstants.VOYAGE_API_GRANT_TYPE, grantType);
+        propertiesMap.put(VoyageConstants.VOYAGE_API_GRANT_TYPE_VALUE, grantTypeValue);
+        propertiesMap.put(VoyageConstants.REQUEST_SCOPE, "");
+        propertiesMap.put(VoyageConstants.VOYAGE_API_OAUTH_TOKEN_URL, oAuthTokenUrl);
 
         HttpEntity httpEntity =
                  Utils.buildAuthTokenHeadersAndRequestBody(propertiesMap);
@@ -212,6 +211,7 @@ public class VoyageApplicationAuthenticaionStepdefs {
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
+            throw e;
         }
         return response;
     }
@@ -225,7 +225,6 @@ public class VoyageApplicationAuthenticaionStepdefs {
 
     @Given("^an access_token \"([^\"]*)\"$")
     public void an_access_token(String arg1) throws Throwable {
-        // invalid key
         Assert.assertEquals(context.getEnvironment().getProperty("" +
                 "voyagestepdefinvalidauthtken.accesstoken"), arg1);
     }
@@ -238,8 +237,6 @@ public class VoyageApplicationAuthenticaionStepdefs {
 
     @When("^I request the login through JWT token$")
     public void i_request_the_login_through_JWT_token() throws Throwable {
-        // RestTemplate execution code
-        //ResponseEntity response = generateAuthToken();
         String accessToken = context.getEnvironment().getProperty("" +
                 "voyagestepdefinvalidauthtken.accesstoken");
         String serviceUrlForStatus = context.getEnvironment().getProperty("" +
@@ -258,39 +255,13 @@ public class VoyageApplicationAuthenticaionStepdefs {
             e.printStackTrace();
             Assert.assertTrue(e.getMessage().contains("401"));
             oauth401UnAuthorizedMessage = e.getMessage();
+            // not throwing the exception as its a negative testcase
             return;
         }
         Assert.fail();
     }
 
-   /*  private HttpEntity buildRequestBody(HttpHeaders headers) {
-        String clientId = context.getEnvironment().getProperty("" +
-                "voyagestepdef.clientid");
-        String clientIdValue = context.getEnvironment().getProperty("" +
-                "voyagestepdef.clientidvalue");
-        String clientSecret = context.getEnvironment().getProperty("" +
-                "voyagestepdef.clientsercret");
-        String clientSecretValue = context.getEnvironment().getProperty("" +
-                "voyagestepdef.clientsecretvalue");
-        String grantType = context.getEnvironment().getProperty("" +
-                "voyagestepdef.granttype");
-        String grantTypeValue = context.getEnvironment().getProperty("" +
-                "voyagestepdef.granttypevalue");
-
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<String,
-                String>();
-        body.add(clientId, clientIdValue);
-        body.add(clientSecret, clientSecretValue);
-        body.add(grantType, grantTypeValue);
-        body.add("scope", "");
-
-        HttpEntity<?> httpEntity = new HttpEntity<Object>(body, headers);
-
-        return httpEntity;
-    }*/
-
-
-    @Then("^I should get a failed login message \"([^\"]*)\"$")
+     @Then("^I should get a failed login message \"([^\"]*)\"$")
     public void iShouldGetAFailedLoginMessage(String arg0) throws Throwable {
         Assert.assertTrue(oauth401UnAuthorizedMessage.startsWith("401"));
     }
