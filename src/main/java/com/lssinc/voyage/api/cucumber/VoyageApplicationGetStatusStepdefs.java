@@ -22,6 +22,7 @@ package com.lssinc.voyage.api.cucumber;
 import com.lssinc.voyage.api.cucumber.util.Utils;
 import com.lssinc.voyage.api.cucumber.util.VoyageConstants;
 import com.sun.glass.ui.Application;
+import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -60,12 +61,17 @@ import java.util.Map;
 @WebAppConfiguration
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest
         .WebEnvironment.RANDOM_PORT)
-public class VoyageApplicationAuthenticationStepdefs {
+public class VoyageApplicationGetStatusStepdefs {
 
     /**.
      * OK message for verifying against the successful response
      */
     public static final String OK_200 = "<200 OK";
+
+    /**.
+     * saves the token response
+     */
+    private static ResponseEntity responseSaved = null;
 
     /**.
      *
@@ -103,57 +109,6 @@ public class VoyageApplicationAuthenticationStepdefs {
      *  oauth401 is used to verifying step for using invalid bearer token
      */
     private static String oauth401UnAuthorizedMessage;
-
-
-    @Given("^a Oauth(\\d+) url \"([^\"]*)\"$")
-    public void a_Oauth_url(int arg1, String arg2) throws Throwable {
-        URI url = null;
-        try {
-             url = new URI(arg2);
-        } catch (Exception e) {
-            Assert.fail();
-            throw e;
-        }
-        Assert.assertNotNull(url);
-    }
-
-    @And("^with token name \"([^\"]*)\"$")
-    public void withTokenName(String arg0) throws Throwable {
-        Assert.assertEquals(context.getEnvironment().getProperty(""
-                + "voyagestepdef.tokenname"), arg0);
-    }
-
-    @And("^with Client ID \"([^\"]*)\"$")
-    public void withClientID(String arg0) throws Throwable {
-        Assert.assertEquals(context.getEnvironment().getProperty(""
-                + "voyagestepdef.clientidvalue"), arg0);
-    }
-
-    @Given("^with Client Secret 'secret'$")
-    public void with_Client_Secret_secret() throws Throwable {
-        Assert.assertNotNull(context.getEnvironment().getProperty(""
-                + "voyagestepdef.clientid"));
-    }
-
-    @Given("^with Grant Type 'client_credentials'$")
-    public void with_Grant_Type_client_credentials() throws Throwable {
-        Assert.assertNotNull(context.getEnvironment().getProperty(""
-                + "voyagestepdef.granttypevalue"));
-    }
-
-    @When("^I request the 'Oauth(\\d+)' token form of this url$")
-    public void iRequestTheOauthTokenFormOfThisUrl(int arg0) throws Throwable {
-        ResponseEntity response = null;
-        try {
-            response =  getAuthToken();
-        } catch (Exception e) {
-            Assert.fail();
-            throw e;
-        }
-        Assert.assertNotNull(response);
-        Assert.assertTrue(response.toString().startsWith(OK_200));
-        oauth2TokenSuccessMessage = HttpStatus.OK.toString();
-    }
 
     /**
      *
@@ -223,35 +178,31 @@ public class VoyageApplicationAuthenticationStepdefs {
         return response;
     }
 
-    @Then("^I should obtain the following JSON message \"([^\"]*)\"$")
-    public void i_should_obtain_the_following_JSON_message(String arg1)
-            throws Throwable {
-        Assert.assertEquals(oauth2TokenSuccessMessage, HttpStatus.OK
-                .toString());
+
+    @Given("^user has a valid authentication token$")
+    public void userHasAValidAuthenticationToken() throws Throwable {
+
+        try {
+            responseSaved =  getAuthToken();
+        } catch (Exception e) {
+            Assert.fail();
+            throw e;
+        }
+        oauth2TokenSuccessMessage = HttpStatus.OK.toString();
+        Assert.assertNotNull(responseSaved);
+        Assert.assertTrue(responseSaved.toString().startsWith(OK_200));
     }
 
-    @Given("^an access_token \"([^\"]*)\"$")
-    public void an_access_token(String arg1) throws Throwable {
-        Assert.assertEquals(context.getEnvironment().getProperty(""
-                + "voyagestepdefinvalidauthtken.accesstoken"), arg1);
-    }
-
-    @Given("^with \"([^\"]*)\"$")
-    public void with(String arg1) throws Throwable {
-        Assert.assertEquals(context.getEnvironment().getProperty(""
-                + "voyagestepdefinvalidauthtken.serviceurlforstatus"), arg1);
-    }
-
-    @When("^I request the login through JWT token$")
-    public void i_request_the_login_through_JWT_token() throws Throwable {
-        String accessToken = context.getEnvironment().getProperty(""
-                + "voyagestepdefinvalidauthtken.accesstoken");
-        String serviceUrlForStatus = context.getEnvironment().getProperty(""
-                +  "voyagestepdefinvalidauthtken.serviceurlforstatus");
-        String responseMessage = context.getEnvironment().getProperty(""
-                + "voyagestepdefinvalidauthtken.responsemessage");
-         HttpHeaders headers = Utils
-                 .buildBasicHttpHeadersForBearerAuthentication(accessToken);
+    @When("^user requests for \"([^\"]*)\"$")
+    public void userRequestsFor(String arg0) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        int beginIndex = 25;
+        int endIndex = 1025;
+        String accessToken = responseSaved.toString().substring(beginIndex,
+                 endIndex);
+        String serviceUrlForStatus = arg0;
+        HttpHeaders headers = Utils
+                .buildBasicHttpHeadersForBearerAuthentication(accessToken);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         ResponseEntity<String> response = null;
         try {
@@ -260,29 +211,16 @@ public class VoyageApplicationAuthenticationStepdefs {
                             String.class);
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.assertTrue(e.getMessage().contains("401"));
             oauth401UnAuthorizedMessage = e.getMessage();
+            Assert.fail();
             // not throwing the exception as its a negative testcase
-            return;
         }
-        Assert.fail();
+        Assert.assertNotNull(response);
     }
 
-    @Then("^I should get a failed login message \"([^\"]*)\"$")
-    public void iShouldGetAFailedLoginMessage(String arg0) throws Throwable {
-        Assert.assertTrue(oauth401UnAuthorizedMessage.startsWith("401"));
+    @Then("^I should obtain the following\"$")
+    public void iShouldObtainTheFollowing() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        Assert.assertNull(oauth401UnAuthorizedMessage);
     }
-
-    @And("^with Client Secret \"([^\"]*)\"$")
-    public void withClientSecret(String arg0) throws Throwable {
-        Assert.assertEquals(context.getEnvironment().getProperty(""
-                + "voyagestepdef.clientsecretvalue"), arg0);
-    }
-
-    @And("^with Grant Type \"([^\"]*)\"$")
-    public void withGrantType(String arg0) throws Throwable {
-        Assert.assertEquals(context.getEnvironment().getProperty(""
-                + "voyagestepdef.granttypevalue"), arg0);
-    }
-
 }
