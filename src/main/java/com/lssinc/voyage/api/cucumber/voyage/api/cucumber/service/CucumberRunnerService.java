@@ -18,6 +18,7 @@
  */
 package com.lssinc.voyage.api.cucumber.voyage.api.cucumber.service;
 
+import com.github.mkolisnyk.cucumber.reporting.CucumberDetailedResults;
 import org.junit.runner.Computer;
 import org.junit.runner.JUnitCore;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class CucumberRunnerService {
 
     /**.
      *  voyage authentication token runner, it runs integrated test cases
-     *  related to authentication token generation
+     *  related to authentication and authorization
      * @throws Exception if unable to generate a token
      */
     public void voyageApiAuthenticationRunner() throws Exception {
@@ -45,5 +46,23 @@ public class CucumberRunnerService {
             throw e;
         }
 
+    }
+
+    /**.
+     *
+     */
+    public void getCucumberReports() throws Exception {
+        try {
+            CucumberDetailedResults results = new CucumberDetailedResults();
+            results.setOutputDirectory("src/main/resources/static");
+            results.setOutputName("cucumber-results");
+            results.setSourceFile(
+                    "src/main/resources/static/cucumber.json");
+            results.execute();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 }

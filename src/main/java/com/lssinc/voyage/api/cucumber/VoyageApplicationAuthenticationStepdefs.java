@@ -273,10 +273,6 @@ public class VoyageApplicationAuthenticationStepdefs {
         Assert.assertTrue(oauth401UnAuthorizedMessage.startsWith("401"));
     }
 
-    public static void main(String[] args) {
-
-    }
-
     @And("^with Client Secret \"([^\"]*)\"$")
     public void withClientSecret(String arg0) throws Throwable {
         Assert.assertEquals(context.getEnvironment().getProperty(""

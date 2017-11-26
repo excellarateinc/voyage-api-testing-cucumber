@@ -14,6 +14,8 @@ buildscript {
                 "${springBootVersion}")
         classpath("com.github.samueltbrown:gradle-cucumber-plugin:0.9")
         classpath("io.spring.gradle:dependency-management-plugin:0.6.1.RELEASE")
+        classpath "com.github.viswaramamoorthy:gradle-util-plugins:0.1" +
+                ".0-RELEASE"
     }
 }
 
@@ -24,6 +26,8 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
 apply plugin: 'findbugs'
+apply plugin: 'maven'
+apply plugin: 'ManifestClasspath'
 
 
 group = 'voyage-api-testing-cucumber'
@@ -52,14 +56,33 @@ dependencies {
             version: '1.4.0.RELEASE'
     compile group: 'org.springframework', name: 'spring-context', version:
             '4.3.12.RELEASE'
+    compile group: 'org.springframework.boot', name:
+            'spring-boot-starter-web', version: '1.5.8.RELEASE'
+    compile group: 'org.springframework.boot', name:
+            'spring-boot-starter-parent', version: '1.5.8.RELEASE', ext: 'pom'
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
 
     // cucumber API's for your step implementations
-    compile group: 'info.cukes', name: 'cucumber-java', version: '1.2.5'
+    compile group: 'info.cukes', name: 'cucumber-java8', version: '1.2.5'
     compile group: 'info.cukes', name: 'cucumber-jvm', version: '1.2.5', ext:
             'pom'
     compile group: 'info.cukes', name: 'cucumber-junit', version: '1.2.5'
     compile group: 'info.cukes', name: 'cucumber-spring', version: '1.2.5'
     compile group: 'info.cukes', name: 'cucumber-junit', version: '1.2.5'
+
+    // maven plugin for cucumber reports
+    compile group: 'org.apache.maven.plugins', name: 'maven-compiler-plugin',
+            version: '3.7.0'
+    compile group: 'org.apache.maven.plugins', name: 'maven-surefire-plugin',
+            version: '2.20.1'
+    compile group: 'org.apache.maven.plugins', name:
+            'maven-surefire-report-plugin', version: '2.20.1'
+
+/*    compile group: 'org.apache.maven.plugins', name: 'maven-site-plugin',
+            version: '3.6'*/
+
+    compile group: 'com.github.mkolisnyk', name: 'cucumber-report-generator',
+            version: '1.3'
 
 
     // Runtime dependencies
@@ -99,8 +122,9 @@ configurations {
 
 cucumber {
     // generate cucumber reports
-    formats = ['pretty', 'json:build/cucumber/cucumber.json',
-               'junit:build/cucumber/cucumber.xml', 'html:build/cucumber/html']
+    formats = ['pretty', 'json:src/main/resources/static/cucumber.json',
+               'junit:src/main/resources/static/cucumber.xml',
+               'html:src/main/resources/static']
     // can run all features/scenarios except for those annotated with @Ignore
     tags = ['~@Ignore']
 }
@@ -157,9 +181,11 @@ tasks.withType(Pmd) {
 
 }
 
+
 // ****************************************************************************
 // Pass environment variables to Spring BootRun task when running from Gradle
 // ****************************************************************************
+
 tasks.withType(BootRunTask) {
     bootRun.systemProperties = System.properties as Map<String, ?>
 }

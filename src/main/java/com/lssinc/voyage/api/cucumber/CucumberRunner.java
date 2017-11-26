@@ -31,7 +31,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RunWith(Cucumber.class)
-@CucumberOptions(format = {"pretty", "html:target/cucumber"},
+@CucumberOptions(format = {"pretty", "json:src/main/resources/static/cucumber"
+        + ".json", "html:src/main/resources/static"},
         features = "src/test/resources/features",
         glue = "com.lssinc.voyage.api.cucumber",
         dryRun = false)
