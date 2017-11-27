@@ -71,6 +71,10 @@ public class VoyageApplicationGetStatusStepdefs {
      *  token end index
      */
     public static final int TOKEN_END_INDEX = 1025;
+    /**.
+     *  voyage api status
+     */
+    public static final String VOYAGE_API_STATUS = "status";
 
     /**.
      * saves the token response
@@ -106,6 +110,12 @@ public class VoyageApplicationGetStatusStepdefs {
      *  oauth401 is used to verifying step for using invalid bearer token
      */
     private static String oauth401UnAuthorizedMessage;
+
+    /**.
+     * stores the response entity for user request test case, it will be used
+     * in the next test case
+     */
+    private static ResponseEntity<String> responseEntityForUserRequest = null;
 
     /**
      *
@@ -201,9 +211,9 @@ public class VoyageApplicationGetStatusStepdefs {
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(accessToken);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
-        ResponseEntity<String> response = null;
+
         try {
-            response = restTemplateBuilder.build()
+            responseEntityForUserRequest = restTemplateBuilder.build()
                     .exchange(serviceUrlForStatus, HttpMethod.GET, entity,
                             String.class);
         } catch (Exception e) {
@@ -212,11 +222,13 @@ public class VoyageApplicationGetStatusStepdefs {
             Assert.fail();
             // not throwing the exception as its a negative testcase
         }
-        Assert.assertNotNull(response);
+        Assert.assertNotNull(responseEntityForUserRequest);
     }
 
-    @Then("^I should obtain the following\"$")
-    public void iShouldObtainTheFollowing() throws Throwable {
-        Assert.assertNull(oauth401UnAuthorizedMessage);
+    @Then("^I should obtain the following$")
+    public void iShouldObtainTheFollowing(String arg0) throws Throwable {
+        Assert.assertNotNull(responseEntityForUserRequest);
+        Assert.assertTrue(responseEntityForUserRequest.toString()
+                .contains(VOYAGE_API_STATUS));
     }
 }
