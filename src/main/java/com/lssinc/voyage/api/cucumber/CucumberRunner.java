@@ -19,6 +19,7 @@
 
 package com.lssinc.voyage.api.cucumber;
 
+import com.github.mkolisnyk.cucumber.runner.ExtendedCucumberOptions;
 import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
 import org.junit.runner.RunWith;
@@ -31,14 +32,35 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RunWith(Cucumber.class)
-@CucumberOptions(format = {"pretty", "json:src/main/resources/static/cucumber"
-        + ".json", "html:src/main/resources/static",
-        "junit:src/main/resources/static/cucumber.xml"},
+@ExtendedCucumberOptions(
+        jsonReport = "src/main/resources/static//cucumber.json",
+        retryCount = CucumberRunner.CUCUMBER_EXTENDED_RETRY_COUNT,
+        detailedReport = true,
+        detailedAggregatedReport = true,
+        overviewReport = true,
+        coverageReport = true,
+        jsonUsageReport = "src/main/resources/static/cucumber-usage.json",
+        usageReport = true,
+        toPDF = true,
+        excludeCoverageTags = {"@flaky" },
+        includeCoverageTags = {"@passed" },
+        outputFolder = "cucumber-results")
+@CucumberOptions(format = {"pretty",
+        "json:src/main/resources/static/cucumber.json",
+        "html:src/main/resources/static",
+        "junit:src/main/resources/static/cucumber.xml",
+        "usage:src/main/resources/static/cucumber-usage.json"},
         features = "src/test/resources/features",
         glue = "com.lssinc.voyage.api.cucumber",
         dryRun = false)
 @PropertySource(value = {"classpath:application.yml"})
 public class CucumberRunner {
+
+    /**.
+     * cucumber retry count
+     */
+    public static final int CUCUMBER_EXTENDED_RETRY_COUNT = 3;
+
     public CucumberRunner() {
 
     }

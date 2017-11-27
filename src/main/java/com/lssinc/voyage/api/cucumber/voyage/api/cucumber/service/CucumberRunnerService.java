@@ -21,6 +21,8 @@ package com.lssinc.voyage.api.cucumber.voyage.api.cucumber.service;
 import com.github.mkolisnyk.cucumber.reporting.CucumberDetailedResults;
 import org.junit.runner.Computer;
 import org.junit.runner.JUnitCore;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import com.lssinc.voyage.api.cucumber.CucumberRunner;
 
@@ -29,6 +31,11 @@ import com.lssinc.voyage.api.cucumber.CucumberRunner;
  */
 @Service
 public class CucumberRunnerService {
+    /**.
+     * application context
+     */
+    @Autowired
+    private ApplicationContext context;
 
     /**.
      *  voyage authentication token runner, it runs integrated test cases
@@ -53,12 +60,20 @@ public class CucumberRunnerService {
      */
     public void getCucumberReports() throws Exception {
         try {
+            String cucumberOutputFolder =
+            context.getEnvironment().getProperty(""
+                    + "cucumberproperties.outputdirectory");
+            String cucumberOutputName =
+                    context.getEnvironment().getProperty(""
+                            + "cucumberproperties.outputname");
+            String cucumberSourceFile =
+                    context.getEnvironment().getProperty(""
+                            + "cucumberproperties.sourcefile");
             CucumberDetailedResults results = new CucumberDetailedResults();
-            results.setOutputDirectory("src/main/resources/static");
-            results.setOutputName("cucumber-results");
-            results.setSourceFile(
-                    "src/main/resources/static/cucumber.json");
-            results.execute();
+            results.setOutputDirectory(cucumberOutputFolder);
+            results.setOutputName(cucumberOutputName);
+            results.setSourceFile(cucumberSourceFile);
+            results.execute(true);
 
         } catch (Exception e) {
             e.printStackTrace();

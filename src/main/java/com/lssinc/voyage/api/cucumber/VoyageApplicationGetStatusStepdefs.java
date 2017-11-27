@@ -22,8 +22,6 @@ package com.lssinc.voyage.api.cucumber;
 import com.lssinc.voyage.api.cucumber.util.Utils;
 import com.lssinc.voyage.api.cucumber.util.VoyageConstants;
 import com.sun.glass.ui.Application;
-import cucumber.api.PendingException;
-import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -35,7 +33,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -47,7 +44,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,6 +63,14 @@ public class VoyageApplicationGetStatusStepdefs {
      * OK message for verifying against the successful response
      */
     public static final String OK_200 = "<200 OK";
+    /**.
+     *  token begin index
+     */
+    public static final int TOKEN_BEGIN_INDEX = 25;
+    /**.
+     *  token end index
+     */
+    public static final int TOKEN_END_INDEX = 1025;
 
     /**.
      * saves the token response
@@ -74,7 +78,6 @@ public class VoyageApplicationGetStatusStepdefs {
     private static ResponseEntity responseSaved = null;
 
     /**.
-     *
      * @return RestTemplate
      */
     @Bean
@@ -88,16 +91,10 @@ public class VoyageApplicationGetStatusStepdefs {
     private RestTemplateBuilder restTemplateBuilder;
 
     /**.
-     *
+     *  application context
      */
     @Autowired
     private ApplicationContext context;
-
-    /**.
-     *
-     */
-    @Autowired
-    private Environment environment;
 
     /**.
      *  oauth2TokenSuccessMessage is used to verifying steps to successful
@@ -196,8 +193,8 @@ public class VoyageApplicationGetStatusStepdefs {
     @When("^user requests for \"([^\"]*)\"$")
     public void userRequestsFor(String arg0) throws Throwable {
         // Write code here that turns the phrase above into concrete actions
-        int beginIndex = 25;
-        int endIndex = 1025;
+        int beginIndex = TOKEN_BEGIN_INDEX;
+        int endIndex = TOKEN_END_INDEX;
         String accessToken = responseSaved.toString().substring(beginIndex,
                  endIndex);
         String serviceUrlForStatus = arg0;
@@ -220,7 +217,6 @@ public class VoyageApplicationGetStatusStepdefs {
 
     @Then("^I should obtain the following\"$")
     public void iShouldObtainTheFollowing() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
         Assert.assertNull(oauth401UnAuthorizedMessage);
     }
 }

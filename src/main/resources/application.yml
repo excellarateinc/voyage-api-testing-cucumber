@@ -59,6 +59,11 @@ voyagestepdefinvalidauthtken:
   serviceurlforstatus: "http://localhost:8080/api/v1/statuses"
   responsemessage: "The remote server returned an error: (401) Unauthorized."
 
+cucumberproperties:
+  outputdirectory: src/main/resources/static
+  outputname: cucumber-results
+  sourcefile: src/main/resources/static/cucumber.json
+
 #######################################################################################################################
 #
 #######################################################################################################################

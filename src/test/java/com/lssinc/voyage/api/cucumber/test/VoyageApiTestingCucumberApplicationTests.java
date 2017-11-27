@@ -43,7 +43,6 @@ public class VoyageApiTestingCucumberApplicationTests {
         Computer computer = new Computer();
         JUnitCore jUnitCore = new JUnitCore();
         jUnitCore.run(computer, CucumberRunner.class);
-        //System.out.println(runner.hashCode());
     }
 
 }
