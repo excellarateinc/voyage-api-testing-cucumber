@@ -85,13 +85,10 @@ public class VoyageApiTestingController {
         try {
             serviceRunner.voyageApiAuthenticationRunner();
             serviceRunner.getCucumberReports();
-            //return "forward:http://localhost:8083/cucumber-results-test" +
-                    //"-results.html";
-
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.TEXT_HTML);
-            String url = "http://localhost:8083/cucumber-results-test-results"
-                    + ".html";
+            String url = "http://localhost:8083/cucumber-results-agg-test" +
+                    "-results.html";
             //set response entity
             HttpEntity<Object> entity = new HttpEntity<Object>(headers);
             ResponseEntity<String> responseEntity =
