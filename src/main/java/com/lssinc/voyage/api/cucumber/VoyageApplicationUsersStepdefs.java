@@ -16,12 +16,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.lssinc.voyage.api.cucumber;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lssinc.voyage.api.cucumber.domain.AuthenticationJwtToken;
 import com.lssinc.voyage.api.cucumber.util.Utils;
 import com.lssinc.voyage.api.cucumber.util.VoyageConstants;
 import com.sun.glass.ui.Application;
+import cucumber.api.PendingException;
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -40,11 +43,17 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.support.BasicAuthorizationInterceptor;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json
+        .AbstractJackson2HttpMessageConverter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +68,7 @@ import java.util.Map;
 @WebAppConfiguration
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest
         .WebEnvironment.RANDOM_PORT)
-public class VoyageApplicationGetStatusStepdefs {
+public class VoyageApplicationUsersStepdefs {
 
     /**
      * .
@@ -103,6 +112,10 @@ public class VoyageApplicationGetStatusStepdefs {
      * in the next test case
      */
     private static ResponseEntity<String> responseEntityForUserRequest = null;
+    /**.
+     *
+     */
+    private static ResponseEntity<String> responseEntityUserList = null;
     /**
      * .
      * Rest template used to call rest services from Voyage API
@@ -170,6 +183,18 @@ public class VoyageApplicationGetStatusStepdefs {
     private String grantTypeValue;
 
     /**.
+     *
+     */
+    @Value("${voyagestepdef.granttypevalue}")
+    private String accessToken;
+
+    /**.
+     *
+     */
+    @Value("${voyagestepdefinvalidauthtken.serviceurlforusers}")
+    private String serviceUrlForStatus;
+
+    /**.
      * @return RestTemplate
      */
     @Bean
@@ -211,11 +236,20 @@ public class VoyageApplicationGetStatusStepdefs {
 
             restTemplate.getInterceptors().add(
                     new BasicAuthorizationInterceptor(user, password));
+            restTemplate.getMessageConverters().add(new
+                    StringHttpMessageConverter());
+                    response =
+                            restTemplate.exchange(oAuthTokenUrl, HttpMethod
+                                    .POST, httpEntity, String.class);
 
-            response =
-                    restTemplate.exchange(oAuthTokenUrl, HttpMethod.POST,
-                            httpEntity,
-                            String.class);
+            ObjectMapper mapper = new ObjectMapper();
+            String responseBody = response.getBody();
+            InputStream stream = new ByteArrayInputStream(responseBody
+                    .getBytes(StandardCharsets.UTF_8.name()));
+            AuthenticationJwtToken readValue = mapper.readValue(stream,
+                    AuthenticationJwtToken.class);
+            System.out.print("");
+
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -224,22 +258,7 @@ public class VoyageApplicationGetStatusStepdefs {
         return response;
     }
 
-
-    @Given("^user has a valid authentication token$")
-    public void userHasAValidAuthenticationToken() throws Throwable {
-
-        try {
-            responseSaved = getAuthToken();
-        } catch (Exception e) {
-            Assert.fail();
-            throw e;
-        }
-        oauth2TokenSuccessMessage = HttpStatus.OK.toString();
-        Assert.assertNotNull(responseSaved);
-        Assert.assertTrue(responseSaved.toString().startsWith(OK_200));
-    }
-
-    @When("^user requests for \"([^\"]*)\"$")
+    @When("^user requests for list of users \"([^\"]*)\"$")
     public void userRequestsFor(String arg0) throws Throwable {
         // Write code here that turns the phrase above into concrete actions
         int beginIndex = TOKEN_BEGIN_INDEX;
@@ -264,10 +283,37 @@ public class VoyageApplicationGetStatusStepdefs {
         Assert.assertNotNull(responseEntityForUserRequest);
     }
 
-    @Then("^I should obtain the following$")
-    public void iShouldObtainTheFollowing(String arg0) throws Throwable {
-        Assert.assertNotNull(responseEntityForUserRequest);
-        Assert.assertTrue(responseEntityForUserRequest.toString()
-                .contains(VOYAGE_API_STATUS));
+
+    @Given("^I have a valid jwt token$")
+    public void iHaveAValidJwtToken() throws Throwable {
+        responseSaved = getAuthToken();
+        Assert.assertNotNull(responseSaved);
     }
+    @And("^with users url \"([^\"]*)\"$")
+    public void withUsersUrl(String arg0) throws Throwable {
+        String token = responseSaved.toString().substring(TOKEN_BEGIN_INDEX, TOKEN_END_INDEX);
+        HttpHeaders headers = Utils
+                .buildBasicHttpHeadersForBearerAuthentication(token);
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+
+        try {
+            responseEntityUserList = restTemplateBuilder.build()
+                    .exchange(arg0, HttpMethod.GET, entity,
+                            String.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.assertTrue(e.getMessage().contains("404"));
+            oauth401UnAuthorizedMessage = e.getMessage();
+            // not throwing the exception as its a negative testcase
+            return;
+        }
+        Assert.fail();
+    }
+
+    @Then("^I should obtain the user list$")
+    public void iShouldObtainTheUserList(String arg0) throws Throwable {
+        Assert.assertNotNull(responseEntityForUserRequest);
+    }
+
+
 }

@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RunWith(Cucumber.class)
 @ExtendedCucumberOptions(
-        jsonReport = "src/main/resources/static//cucumber.json",
+        jsonReport = "src/main/resources/static/cucumber.json",
         retryCount = CucumberRunner.CUCUMBER_EXTENDED_RETRY_COUNT,
         detailedReport = true,
         detailedAggregatedReport = true,
