@@ -62,7 +62,7 @@
 
     <!--The Check generates too many violations, fixing them will make code unmanageable.-->
     <suppress checks="MagicNumber"
-              files="(ParseTreeTablePresentation|MainFrame)\.java"/>
+              files="(ParseTreeTablePresentation|MainFrame|CucumberRunner)\.java"/>
 
     <!-- Methods that build fake AST are very long-->
     <suppress checks="MethodLength"

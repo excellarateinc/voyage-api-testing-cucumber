@@ -74,13 +74,22 @@
 
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
 
-        <!-- <module name="JavadocMethod"/> -->
+        <module name="JavadocMethod">
+            <property name="excludeScope" value="private"/>
+        </module>
 
         <module name="JavadocType"/>
 
-        <module name="JavadocVariable"/>
+       <!-- <module name="JavadocVariable">
+            <property name="excludeScope" value="private"/>
+        </module>-->
 
-        <module name="JavadocStyle"/>
+        <module name="JavadocStyle">
+            <property name="checkFirstSentence" value="false"/>
+            <property name="excludeScope" value="package"/>
+            <property name="allowMissingJavadoc" value="false"/>
+            <property name="checkEmptyJavadoc" value="false"/>
+        </module>
 
 
         <!-- Checks for Naming Conventions.                  -->

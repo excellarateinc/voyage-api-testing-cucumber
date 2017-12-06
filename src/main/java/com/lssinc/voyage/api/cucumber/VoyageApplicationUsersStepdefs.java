@@ -23,11 +23,12 @@ import com.lssinc.voyage.api.cucumber.domain.AuthenticationJwtToken;
 import com.lssinc.voyage.api.cucumber.util.Utils;
 import com.lssinc.voyage.api.cucumber.util.VoyageConstants;
 import com.sun.glass.ui.Application;
-import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +45,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.support.BasicAuthorizationInterceptor;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json
-        .AbstractJackson2HttpMessageConverter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -193,6 +192,16 @@ public class VoyageApplicationUsersStepdefs {
      */
     @Value("${voyagestepdefinvalidauthtken.serviceurlforusers}")
     private String serviceUrlForStatus;
+    /**
+     * missing parameter error message
+     */
+    private static String oauth400MissingRequiredParameter;
+
+    /**
+     * missing parameter error message
+     */
+    private static String oauth401;
+    private static String oauth204;
 
     /**.
      * @return RestTemplate
@@ -291,7 +300,8 @@ public class VoyageApplicationUsersStepdefs {
     }
     @And("^with users url \"([^\"]*)\"$")
     public void withUsersUrl(String arg0) throws Throwable {
-        String token = responseSaved.toString().substring(TOKEN_BEGIN_INDEX, TOKEN_END_INDEX);
+        String token = responseSaved.toString().substring(TOKEN_BEGIN_INDEX,
+                TOKEN_END_INDEX);
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(token);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
@@ -315,5 +325,242 @@ public class VoyageApplicationUsersStepdefs {
         Assert.assertNotNull(responseEntityForUserRequest);
     }
 
+    @When("^user requests for \"([^\"]*)\" creating user$")
+    public void userRequestsForCreatingUser(String arg0) throws Throwable {
+        String token = responseSaved.toString().substring(TOKEN_BEGIN_INDEX,
+                TOKEN_END_INDEX);
+        HttpHeaders headers = Utils
+                .buildBasicHttpHeadersForBearerAuthentication(token);
+        String body =  updateRequestBodyFor();
+        HttpEntity<?> httpEntity = new HttpEntity<Object>(body, headers);
 
+        try {
+            responseEntityUserList = restTemplateBuilder.build()
+                    .exchange(arg0, HttpMethod.POST, httpEntity,
+                            String.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.assertTrue(e.getMessage().contains("404"));
+            oauth401UnAuthorizedMessage = e.getMessage();
+            // not throwing the exception as its a negative testcase
+            return;
+        }
+    }
+
+    /**.
+     * @return returns the json test user request object
+     */
+    private String updateRequestBodyFor() {
+        JSONObject request = null;
+        try {
+            String jsonString = "{\"firstName\":\"FirstName3\","
+                    + "\"lastName\":\"LastName3\","
+                    + "\"password\":\"my-secure-password\","
+                    + "\"phones\":[{\"phoneType\":\"MOBILE\","
+                    + "\"phoneNumber\":\"6518886021\"}],"
+                    + "\"email\":\"FirstName3@app.com\","
+                    + "\"username\":\"FirstName3@app.com\"}";
+
+            request = new JSONObject(jsonString);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return request.toString();
+    }
+
+    /**.
+     * @return returns the json test user request object with missing
+     * required parameter
+     */
+    private String updateRequestBodyForWithMissingRequiredParameters() {
+        JSONObject request = null;
+        try {
+            String jsonString = "{\"firstName\":\"FirstName1\","
+                    + "\"lastName\":\"LastName1\","
+                    + "\"password\":\"my-secure-password\","
+                    + "\"phones\":[{\"phoneType\":\"MOBILE\","
+                    + "\"phoneNumber\":null\"}],"
+                    + "\"email\":\"FirstName4@app.com\","
+                    + "\"username\":\"FirstName4@app.com\"}";
+
+            request = new JSONObject(jsonString);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return request.toString();
+    }
+
+    /**.
+     * @return returns the json test user request object for updating data
+     */
+    private String updateRequestBodyForUpdating() {
+        JSONObject request = null;
+        try {
+            String jsonString = "{\"id\":1,\"firstName\":\"Super"
+                    + "\",\"lastName\":\"User\","
+                    + "\"username\":\"super\","
+                    + "\"email\":\"support@LighthouseSoftware.com\","
+                    + "\"password\":\"$2a$10$.Qa2l9VysOeG5M8HhgUbQ"
+                    + ".h8KlTBLdMY/slPwMtL/I5OYibYUFQle\","
+                    + "\"isEnabled\":true,\"isAccountExpired\":false,"
+                    + "\"isAccountLocked\":false,"
+                    + "\"isCredentialsExpired\":false,"
+                    + "\"phones\":[{\"id\":1,"
+                    + "\"phoneType\":\"MOBILE\","
+                    + "\"phoneNumber\":\"16518886021\"},{\"id\":2,"
+                    + "\"phoneType\":\"OFFICE\","
+                    + "\"phoneNumber\":\"16518886022\"},{\"id\":3,"
+                    + "\"phoneType\":\"HOME\","
+                    + "\"phoneNumber\":\"16518886023\"},{\"id\":4,"
+                    + "\"phoneType\":\"OTHER\","
+                    + "\"phoneNumber\":\"16518886024\"}]}";
+
+            request = new JSONObject(jsonString);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return request.toString();
+    }
+
+    @Then("^I should obtain the following for creating user$")
+    public void iShouldObtainTheFollowingForCreatingUser(String arg0) throws
+                                                                      Throwable {
+        String body = responseEntityUserList.getBody();
+        Assert.assertTrue(body.contains("FirstName4@app.com"));
+    }
+
+
+    @When("^user requests for \"([^\"]*)\" creating user with missing "
+           + "required parameter$")
+    public void userRequestsForCreatingUserWithMissingRequiredParameter
+            (String arg0) throws Throwable {
+        String token = responseSaved.toString().substring(TOKEN_BEGIN_INDEX,
+                TOKEN_END_INDEX);
+        HttpHeaders headers = Utils
+                .buildBasicHttpHeadersForBearerAuthentication(token);
+        String body =  updateRequestBodyForWithMissingRequiredParameters();
+        HttpEntity<?> httpEntity = new HttpEntity<Object>(body, headers);
+
+        try {
+            responseEntityUserList = restTemplateBuilder.build()
+                    .exchange(arg0, HttpMethod.POST, httpEntity,
+                            String.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.assertTrue(e.getMessage().contains("400"));
+            oauth400MissingRequiredParameter = e.getMessage().trim();
+            // not throwing the exception as its a negative testcase
+            return;
+        }
+    }
+
+ /*   @Then("^I should obtain the following for creating user with missing " +
+            "required parameter$")
+    public void
+    iShouldObtainTheFollowingForCreatingUserWithMissingRequiredParameter
+            (String arg0)
+            throws Throwable {
+        Assert.assertTrue(oauth400MissingRequiredParameter.equals("400"));
+    }*/
+
+    @Then("^I should obtain the following for creating user with missing " +
+            "required parameter$")
+    public void
+    iShouldObtainTheFollowingForCreatingUserWithMissingRequiredParameter()
+            throws Throwable {
+        Assert.assertTrue(oauth400MissingRequiredParameter.equals("400"));
+    }
+
+    @When("^user requests for \"([^\"]*)\" deleting user$")
+    public void userRequestsForDeletingUser(String arg0) throws Throwable {
+        String token = responseSaved.toString().substring(TOKEN_BEGIN_INDEX,
+                TOKEN_END_INDEX);
+        HttpHeaders headers = Utils
+                .buildBasicHttpHeadersForBearerAuthentication(token);
+        String deleteRecord = arg0.substring(arg0.lastIndexOf('/') + 1);
+        HttpEntity<?> httpEntity = new HttpEntity<Object>(/*params, */headers);
+
+        try {
+            responseEntityUserList = restTemplateBuilder.build()
+                    .exchange(arg0, HttpMethod.DELETE, httpEntity,
+                            String.class, deleteRecord);
+            HttpStatus status = responseEntityUserList.getStatusCode();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+            oauth204 = e.getMessage().trim();
+            // not throwing the exception as its a negative testcase
+            return;
+        }
+    }
+
+    @Then("^I should obtain the deleted record id in response$")
+    public void iShouldObtainTheDeletedRecordIdInResponse(String arg0) throws
+                                                               Throwable {
+        Assert.assertTrue(oauth204 ==
+                HttpStatus.NO_CONTENT.toString());
+    }
+
+    @When("^user requests for \"([^\"]*)\" user details by id$")
+    public void userRequestsForUserDetailsById(String arg0) throws Throwable {
+        String token = responseSaved.toString().substring(TOKEN_BEGIN_INDEX,
+                TOKEN_END_INDEX);
+        HttpHeaders headers = Utils
+                .buildBasicHttpHeadersForBearerAuthentication(token);
+        HttpEntity<?> httpEntity = new HttpEntity<Object>(headers);
+
+        try {
+            responseEntityUserList = restTemplateBuilder.build()
+                    .exchange(arg0, HttpMethod.GET, httpEntity,
+                            String.class);
+            /*ObjectMapper mapper = new ObjectMapper();
+            String responseBody = responseEntityUserList.getBody();
+            InputStream stream = new ByteArrayInputStream(responseBody
+                    .getBytes(StandardCharsets.UTF_8.name()));
+            User readValue = mapper.readValue(stream,
+                    User.class);
+            System.out.println(readValue);*/
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+            return;
+        }
+    }
+
+    @Then("^I should obtain user details in response$")
+    public void iShouldObtainUserDetailsInResponse() throws Throwable {
+        Assert.assertTrue(oauth204 ==
+                HttpStatus.NO_CONTENT.toString());
+    }
+
+    @When("^user requests for updating \"([^\"]*)\" user details by id$")
+    public void userRequestsForUpdatingUserDetailsById(String arg0) throws
+                                                                    Throwable {
+        String token = responseSaved.toString().substring(TOKEN_BEGIN_INDEX,
+                TOKEN_END_INDEX);
+        HttpHeaders headers = Utils
+                .buildBasicHttpHeadersForBearerAuthentication(token);
+        String body =  updateRequestBodyForUpdating();
+        HttpEntity<?> httpEntity = new HttpEntity<Object>(body, headers);
+
+        try {
+            responseEntityUserList = restTemplateBuilder.build()
+                    .exchange(arg0, HttpMethod.PUT, httpEntity,
+                            String.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+            // not throwing the exception as its a negative testcase
+            return;
+        }
+    }
+
+    @Then("^I should get the updated user details in response$")
+    public void iShouldGetTheUpdatedUserDetailsInResponse() throws Throwable {
+        Assert.assertTrue(responseEntityUserList.getStatusCode() ==
+                HttpStatus.OK);
+    }
 }
