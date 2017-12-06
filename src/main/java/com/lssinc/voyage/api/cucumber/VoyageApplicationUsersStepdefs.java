@@ -457,22 +457,22 @@ public class VoyageApplicationUsersStepdefs {
         }
     }
 
- /*   @Then("^I should obtain the following for creating user with missing " +
+    @Then("^I should obtain the following for creating user with missing " +
             "required parameter$")
     public void
     iShouldObtainTheFollowingForCreatingUserWithMissingRequiredParameter
             (String arg0)
             throws Throwable {
         Assert.assertTrue(oauth400MissingRequiredParameter.equals("400"));
-    }*/
+    }
 
-    @Then("^I should obtain the following for creating user with missing " +
+    /*@Then("^I should obtain the following for creating user with missing " +
             "required parameter$")
     public void
     iShouldObtainTheFollowingForCreatingUserWithMissingRequiredParameter()
             throws Throwable {
         Assert.assertTrue(oauth400MissingRequiredParameter.equals("400"));
-    }
+    }*/
 
     @When("^user requests for \"([^\"]*)\" deleting user$")
     public void userRequestsForDeletingUser(String arg0) throws Throwable {
@@ -531,7 +531,8 @@ public class VoyageApplicationUsersStepdefs {
     }
 
     @Then("^I should obtain user details in response$")
-    public void iShouldObtainUserDetailsInResponse() throws Throwable {
+    public void iShouldObtainUserDetailsInResponse(String arg0) throws
+                                                               Throwable {
         Assert.assertTrue(oauth204 ==
                 HttpStatus.NO_CONTENT.toString());
     }
@@ -558,8 +559,15 @@ public class VoyageApplicationUsersStepdefs {
         }
     }
 
-    @Then("^I should get the updated user details in response$")
+    /*@Then("^I should get the updated user details in response$")
     public void iShouldGetTheUpdatedUserDetailsInResponse() throws Throwable {
+        Assert.assertTrue(responseEntityUserList.getStatusCode() ==
+                HttpStatus.OK);
+    }*/
+
+    @Then("^I should get the updated user details in response$")
+    public void iShouldGetTheUpdatedUserDetailsInResponse(String arg0) throws
+                                                               Throwable {
         Assert.assertTrue(responseEntityUserList.getStatusCode() ==
                 HttpStatus.OK);
     }
