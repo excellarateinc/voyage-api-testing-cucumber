@@ -29,6 +29,7 @@ import cucumber.api.java.en.When;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -69,8 +70,86 @@ public class VoyageApplicationAuthenticationStepdefs {
 
     /**.
      *
+     */
+    @Value("${voyagestepdef.clientidvalue}")
+    private String user;
+
+    /**.
+     *
+     */
+    @Value("${voyagestepdef.clientsecretvalue}")
+    private String password;
+
+    /**.
+     *
+     */
+    @Value("${voyagestepdef.oauthtokenurl}")
+    private String oAuthTokenUrl;
+
+    /**.
+     *
+     */
+    @Value("${voyagestepdef.clientid}")
+    private String clientId;
+
+    /**.
+     *
+     */
+    @Value("${voyagestepdef.clientidvalue}")
+    private String clientIdValue;
+
+    /**.
+     *
+     */
+    @Value("${voyagestepdef.clientsercret}")
+    private String clientSecret;
+
+    /**.
+     *
+     */
+    @Value("${voyagestepdef.clientsecretvalue}")
+    private String clientSecretValue;
+
+    /**.
+     *
+     */
+    @Value("${voyagestepdef.granttype}")
+    private String grantType;
+
+    /**.
+     *
+     */
+    @Value("${voyagestepdef.granttypevalue}")
+    private String grantTypeValue;
+
+    /**.
+     *
+     */
+    @Value("${voyagestepdef.tokenname}")
+    private String tokenName;
+
+
+    /**.
+     *
+     */
+    @Value("${voyagestepdefinvalidauthtoken.accesstoken}")
+    private String invalidAuthTokenAccessToken;
+    /**.
+     *
+     */
+    @Value("${voyagestepdefinvalidauthtoken.serviceurlforstatus}")
+    private String invalidAuthTokenServiceurlForStatus;
+    /**.
+     *
+     */
+    @Value("${voyagestepdefinvalidauthtoken.responsemessage}")
+    private String invalidAuthTokenResponseMessage;
+
+
+    /**.
      * @return RestTemplate
      */
+
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
@@ -79,6 +158,11 @@ public class VoyageApplicationAuthenticationStepdefs {
      * Rest template used to call rest services from Voyage API
      */
     @Autowired
+    /**.
+     *
+     * @return RestTemplate
+     */
+
     private RestTemplateBuilder restTemplateBuilder;
 
     /**.
@@ -119,26 +203,22 @@ public class VoyageApplicationAuthenticationStepdefs {
 
     @And("^with token name \"([^\"]*)\"$")
     public void withTokenName(String arg0) throws Throwable {
-        Assert.assertEquals(context.getEnvironment().getProperty(""
-                + "voyagestepdef.tokenname"), arg0);
+        Assert.assertEquals(tokenName, arg0);
     }
 
     @And("^with Client ID \"([^\"]*)\"$")
     public void withClientID(String arg0) throws Throwable {
-        Assert.assertEquals(context.getEnvironment().getProperty(""
-                + "voyagestepdef.clientidvalue"), arg0);
+        Assert.assertEquals(clientIdValue, arg0);
     }
 
     @Given("^with Client Secret 'secret'$")
     public void with_Client_Secret_secret() throws Throwable {
-        Assert.assertNotNull(context.getEnvironment().getProperty(""
-                + "voyagestepdef.clientid"));
+        Assert.assertNotNull(clientSecret);
     }
 
     @Given("^with Grant Type 'client_credentials'$")
     public void with_Grant_Type_client_credentials() throws Throwable {
-        Assert.assertNotNull(context.getEnvironment().getProperty(""
-                + "voyagestepdef.granttypevalue"));
+        Assert.assertNotNull(grantType);
     }
 
     @When("^I request the 'Oauth(\\d+)' token form of this url$")
@@ -156,33 +236,11 @@ public class VoyageApplicationAuthenticationStepdefs {
     }
 
     /**
-     *
      * @return response entity of successful generated token
      */
     private ResponseEntity getAuthToken() throws Exception {
         ResponseEntity<String> response = null;
-        // loading the properties from the property loader into the variables
-        // required for generating OAuth Token
         try {
-        String user = context.getEnvironment().getProperty(""
-                + "voyagestepdef.clientidvalue");
-        String password = context.getEnvironment().getProperty(""
-                + "voyagestepdef.clientsecretvalue");
-        String oAuthTokenUrl = context.getEnvironment().getProperty(""
-                + "voyagestepdef.oauthtokenurl");
-
-        String clientId = context.getEnvironment().getProperty(""
-                + "voyagestepdef.clientid");
-        String clientIdValue = context.getEnvironment().getProperty(""
-                + "voyagestepdef.clientidvalue");
-        String clientSecret = context.getEnvironment().getProperty(""
-                + "voyagestepdef.clientsercret");
-        String clientSecretValue = context.getEnvironment().getProperty(""
-                + "voyagestepdef.clientsecretvalue");
-        String grantType = context.getEnvironment().getProperty(""
-                + "voyagestepdef.granttype");
-        String grantTypeValue = context.getEnvironment().getProperty(""
-                + "voyagestepdef.granttypevalue");
 
         Map<String, String> propertiesMap = new HashMap<String, String>();
         propertiesMap.put(VoyageConstants.VOYAGE_API_USER, user);
@@ -232,35 +290,28 @@ public class VoyageApplicationAuthenticationStepdefs {
 
     @Given("^an access_token \"([^\"]*)\"$")
     public void an_access_token(String arg1) throws Throwable {
-        Assert.assertEquals(context.getEnvironment().getProperty(""
-                + "voyagestepdefinvalidauthtken.accesstoken"), arg1);
+        Assert.assertEquals(invalidAuthTokenAccessToken, arg1);
     }
 
     @Given("^with \"([^\"]*)\"$")
     public void with(String arg1) throws Throwable {
-        Assert.assertEquals(context.getEnvironment().getProperty(""
-                + "voyagestepdefinvalidauthtken.serviceurlforstatus"), arg1);
+        Assert.assertEquals(invalidAuthTokenServiceurlForStatus, arg1);
     }
 
     @When("^I request the login through JWT token$")
     public void i_request_the_login_through_JWT_token() throws Throwable {
-        String accessToken = context.getEnvironment().getProperty(""
-                + "voyagestepdefinvalidauthtken.accesstoken");
-        String serviceUrlForStatus = context.getEnvironment().getProperty(""
-                +  "voyagestepdefinvalidauthtken.serviceurlforstatus");
-        String responseMessage = context.getEnvironment().getProperty(""
-                + "voyagestepdefinvalidauthtken.responsemessage");
-         HttpHeaders headers = Utils
-                 .buildBasicHttpHeadersForBearerAuthentication(accessToken);
+         HttpHeaders headers =
+                 Utils.buildBasicHttpHeadersForBearerAuthentication(invalidAuthTokenAccessToken);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         ResponseEntity<String> response = null;
         try {
             response = restTemplateBuilder.build()
-                    .exchange(serviceUrlForStatus, HttpMethod.GET, entity,
+                    .exchange(invalidAuthTokenServiceurlForStatus, HttpMethod.GET, entity,
                             String.class);
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.assertTrue(e.getMessage().contains("401"));
+            Assert.assertTrue(e.getMessage().trim().equals(HttpStatus
+                    .UNAUTHORIZED.toString()));
             oauth401UnAuthorizedMessage = e.getMessage();
             // not throwing the exception as its a negative testcase
             return;
@@ -275,14 +326,12 @@ public class VoyageApplicationAuthenticationStepdefs {
 
     @And("^with Client Secret \"([^\"]*)\"$")
     public void withClientSecret(String arg0) throws Throwable {
-        Assert.assertEquals(context.getEnvironment().getProperty(""
-                + "voyagestepdef.clientsecretvalue"), arg0);
+        Assert.assertEquals(clientIdValue, arg0);
     }
 
     @And("^with Grant Type \"([^\"]*)\"$")
     public void withGrantType(String arg0) throws Throwable {
-        Assert.assertEquals(context.getEnvironment().getProperty(""
-                + "voyagestepdef.granttypevalue"), arg0);
+        Assert.assertEquals(grantTypeValue, arg0);
     }
 
 }

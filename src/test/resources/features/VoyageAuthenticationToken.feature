@@ -1,7 +1,7 @@
 Feature: SpecFlowFeatureOauth2TokenRequest
   In order to authenticate a user
   As a user of voyage application
-  I want to be able to access resource based on my access permissions
+  I want to generate jwt toke to access resources
 
   Scenario: getting Oauth2 Token
     Given a Oauth2 url "http://localhost:8080/oauth/token"

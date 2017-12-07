@@ -73,7 +73,7 @@ public class VoyageApplicationUsersStepdefs {
      * .
      * OK message for verifying against the successful response
      */
-    public static final String OK_200 = "<200 OK";
+    public static final String MESSAGE_OK_200 = "<200 OK";
     /**
      * .
      * token begin index
@@ -96,15 +96,15 @@ public class VoyageApplicationUsersStepdefs {
     private static ResponseEntity responseSaved = null;
     /**
      * .
-     * oauth2TokenSuccessMessage is used to verifying steps to successful
+     * OAUTH2_SUCCESS_MESSAGE is used to verifying steps to successful
      * oAuthToken generation
      */
-    private static String oauth2TokenSuccessMessage;
+    private static String OAUTH2_SUCCESS_MESSAGE;
     /**
      * .
-     * oauth401 is used to verifying step for using invalid bearer token
+     *  used to verifying step for using invalid bearer token
      */
-    private static String oauth401UnAuthorizedMessage;
+    private static String HTTP_401_UNAUTHORIZED_MESSAGE;
     /**
      * .
      * stores the response entity for user request test case, it will be used
@@ -190,18 +190,19 @@ public class VoyageApplicationUsersStepdefs {
     /**.
      *
      */
-    @Value("${voyagestepdefinvalidauthtken.serviceurlforusers}")
+    @Value("${voyagestepdefinvalidauthtoken.serviceurlforusers}")
     private String serviceUrlForStatus;
     /**
      * missing parameter error message
      */
-    private static String oauth400MissingRequiredParameter;
+    private static String HTTP_400_MISSING_REQUIRED_PARAMETER;
 
     /**
      * missing parameter error message
      */
-    private static String oauth401;
-    private static String oauth204;
+    private static String HTTP_401_UNAUTHORIZED;
+    private static String HTTP_204_NO_CONTENT;
+    private static String MESSAGE_404_UNAUTHORIZED;
 
     /**.
      * @return RestTemplate
@@ -270,10 +271,7 @@ public class VoyageApplicationUsersStepdefs {
     @When("^user requests for list of users \"([^\"]*)\"$")
     public void userRequestsFor(String arg0) throws Throwable {
         // Write code here that turns the phrase above into concrete actions
-        int beginIndex = TOKEN_BEGIN_INDEX;
-        int endIndex = TOKEN_END_INDEX;
-        String accessToken = responseSaved.toString().substring(beginIndex,
-                endIndex);
+        String accessToken = getToken();
         String serviceUrlForStatus = arg0;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(accessToken);
@@ -285,11 +283,18 @@ public class VoyageApplicationUsersStepdefs {
                             String.class);
         } catch (Exception e) {
             e.printStackTrace();
-            oauth401UnAuthorizedMessage = e.getMessage();
+            HTTP_401_UNAUTHORIZED_MESSAGE = e.getMessage();
             Assert.fail();
             // not throwing the exception as its a negative testcase
         }
         Assert.assertNotNull(responseEntityForUserRequest);
+    }
+
+    private String getToken() {
+        int beginIndex = TOKEN_BEGIN_INDEX;
+        int endIndex = TOKEN_END_INDEX;
+        return responseSaved.toString().substring(beginIndex,
+                endIndex);
     }
 
 
@@ -300,8 +305,8 @@ public class VoyageApplicationUsersStepdefs {
     }
     @And("^with users url \"([^\"]*)\"$")
     public void withUsersUrl(String arg0) throws Throwable {
-        String token = responseSaved.toString().substring(TOKEN_BEGIN_INDEX,
-                TOKEN_END_INDEX);
+        String token = context.getEnvironment().getProperty(""
+                + "voyagestepdefinvalidauthtoken.accesstoken");
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(token);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
@@ -312,8 +317,9 @@ public class VoyageApplicationUsersStepdefs {
                             String.class);
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.assertTrue(e.getMessage().contains("404"));
-            oauth401UnAuthorizedMessage = e.getMessage();
+            Assert.assertTrue(e.getMessage().trim().equals(HttpStatus
+                    .UNAUTHORIZED.toString()));
+            HTTP_401_UNAUTHORIZED = e.getMessage();
             // not throwing the exception as its a negative testcase
             return;
         }
@@ -322,7 +328,8 @@ public class VoyageApplicationUsersStepdefs {
 
     @Then("^I should obtain the user list$")
     public void iShouldObtainTheUserList(String arg0) throws Throwable {
-        Assert.assertNotNull(responseEntityForUserRequest);
+        Assert.assertTrue(HttpStatus.BAD_REQUEST.toString().equals
+                (MESSAGE_404_UNAUTHORIZED));
     }
 
     @When("^user requests for \"([^\"]*)\" creating user$")
@@ -341,10 +348,11 @@ public class VoyageApplicationUsersStepdefs {
         } catch (Exception e) {
             e.printStackTrace();
             Assert.assertTrue(e.getMessage().contains("404"));
-            oauth401UnAuthorizedMessage = e.getMessage();
+            HTTP_401_UNAUTHORIZED_MESSAGE = e.getMessage();
             // not throwing the exception as its a negative testcase
             return;
         }
+        Assert.fail();
     }
 
     /**.
@@ -451,7 +459,7 @@ public class VoyageApplicationUsersStepdefs {
         } catch (Exception e) {
             e.printStackTrace();
             Assert.assertTrue(e.getMessage().contains("400"));
-            oauth400MissingRequiredParameter = e.getMessage().trim();
+            HTTP_400_MISSING_REQUIRED_PARAMETER = e.getMessage().trim();
             // not throwing the exception as its a negative testcase
             return;
         }
@@ -463,7 +471,7 @@ public class VoyageApplicationUsersStepdefs {
     iShouldObtainTheFollowingForCreatingUserWithMissingRequiredParameter
             (String arg0)
             throws Throwable {
-        Assert.assertTrue(oauth400MissingRequiredParameter.equals("400"));
+        Assert.assertTrue(HTTP_400_MISSING_REQUIRED_PARAMETER.equals("400"));
     }
 
     /*@Then("^I should obtain the following for creating user with missing " +
@@ -471,7 +479,7 @@ public class VoyageApplicationUsersStepdefs {
     public void
     iShouldObtainTheFollowingForCreatingUserWithMissingRequiredParameter()
             throws Throwable {
-        Assert.assertTrue(oauth400MissingRequiredParameter.equals("400"));
+        Assert.assertTrue(HTTP_400_MISSING_REQUIRED_PARAMETER.equals("400"));
     }*/
 
     @When("^user requests for \"([^\"]*)\" deleting user$")
@@ -491,7 +499,7 @@ public class VoyageApplicationUsersStepdefs {
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
-            oauth204 = e.getMessage().trim();
+            HTTP_204_NO_CONTENT = e.getMessage().trim();
             // not throwing the exception as its a negative testcase
             return;
         }
@@ -500,7 +508,7 @@ public class VoyageApplicationUsersStepdefs {
     @Then("^I should obtain the deleted record id in response$")
     public void iShouldObtainTheDeletedRecordIdInResponse(String arg0) throws
                                                                Throwable {
-        Assert.assertTrue(oauth204 ==
+        Assert.assertTrue(HTTP_204_NO_CONTENT ==
                 HttpStatus.NO_CONTENT.toString());
     }
 
@@ -533,7 +541,7 @@ public class VoyageApplicationUsersStepdefs {
     @Then("^I should obtain user details in response$")
     public void iShouldObtainUserDetailsInResponse(String arg0) throws
                                                                Throwable {
-        Assert.assertTrue(oauth204 ==
+        Assert.assertTrue(HTTP_204_NO_CONTENT ==
                 HttpStatus.NO_CONTENT.toString());
     }
 
@@ -557,6 +565,7 @@ public class VoyageApplicationUsersStepdefs {
             // not throwing the exception as its a negative testcase
             return;
         }
+        Assert.assertNotNull(responseEntityUserList);
     }
 
     /*@Then("^I should get the updated user details in response$")

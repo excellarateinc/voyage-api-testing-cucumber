@@ -65,7 +65,7 @@ public class VoyageApplicationGetStatusStepdefs {
      * .
      * OK message for verifying against the successful response
      */
-    public static final String OK_200 = "<200 OK";
+    public static final String MESSAGE_OK_200 = "<200 OK";
     /**
      * .
      * token begin index
@@ -85,18 +85,19 @@ public class VoyageApplicationGetStatusStepdefs {
      * .
      * saves the token response
      */
-    private static ResponseEntity responseSaved = null;
+    private static ResponseEntity responseToken = null;
     /**
      * .
-     * oauth2TokenSuccessMessage is used to verifying steps to successful
+     * OAUTH2_SUCCESS_MESSAGE is used to verifying steps to successful
      * oAuthToken generation
      */
-    private static String oauth2TokenSuccessMessage;
+    private static String OAUTH2_SUCCESS_MESSAGE;
+
     /**
      * .
      * oauth401 is used to verifying step for using invalid bearer token
      */
-    private static String oauth401UnAuthorizedMessage;
+    private static String HTTP_401_UNAUTHORIZED_MESSAGE;
     /**
      * .
      * stores the response entity for user request test case, it will be used
@@ -229,14 +230,14 @@ public class VoyageApplicationGetStatusStepdefs {
     public void userHasAValidAuthenticationToken() throws Throwable {
 
         try {
-            responseSaved = getAuthToken();
+            responseToken = getAuthToken();
         } catch (Exception e) {
             Assert.fail();
             throw e;
         }
-        oauth2TokenSuccessMessage = HttpStatus.OK.toString();
-        Assert.assertNotNull(responseSaved);
-        Assert.assertTrue(responseSaved.toString().startsWith(OK_200));
+        OAUTH2_SUCCESS_MESSAGE = HttpStatus.OK.toString();
+        Assert.assertNotNull(responseToken);
+        Assert.assertTrue(responseToken.toString().startsWith(MESSAGE_OK_200));
     }
 
     @When("^user requests for \"([^\"]*)\"$")
@@ -244,7 +245,7 @@ public class VoyageApplicationGetStatusStepdefs {
         // Write code here that turns the phrase above into concrete actions
         int beginIndex = TOKEN_BEGIN_INDEX;
         int endIndex = TOKEN_END_INDEX;
-        String accessToken = responseSaved.toString().substring(beginIndex,
+        String accessToken = responseToken.toString().substring(beginIndex,
                 endIndex);
         String serviceUrlForStatus = arg0;
         HttpHeaders headers = Utils
@@ -257,7 +258,7 @@ public class VoyageApplicationGetStatusStepdefs {
                             String.class);
         } catch (Exception e) {
             e.printStackTrace();
-            oauth401UnAuthorizedMessage = e.getMessage();
+            HTTP_401_UNAUTHORIZED_MESSAGE = e.getMessage();
             Assert.fail();
             // not throwing the exception as its a negative testcase
         }
@@ -269,5 +270,7 @@ public class VoyageApplicationGetStatusStepdefs {
         Assert.assertNotNull(responseEntityForUserRequest);
         Assert.assertTrue(responseEntityForUserRequest.toString()
                 .contains(VOYAGE_API_STATUS));
+        Assert.assertTrue(responseEntityForUserRequest.getStatusCode()
+                .toString().trim().equals(HttpStatus.OK.toString()));
     }
 }
