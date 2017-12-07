@@ -1,24 +1,27 @@
 /*
- * Copyright 2017 Lighthouse Software, Inc.   http://www.LighthouseSoftware.com
  *
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ *  * Copyright 2017 Lighthouse Software, Inc.   http://www.LighthouseSoftware.com
+ *  *
+ *  * Licensed to the Apache Software Foundation (ASF) under one or more
+ *  * contributor license agreements.  See the NOTICE file distributed with
+ *  * this work for additional information regarding copyright ownership.
+ *  * The ASF licenses this file to You under the Apache License, Version 2.0
+ *  * (the "License"); you may not use this file except in compliance with
+ *  * the License.  You may obtain a copy of the License at
+ *  *
+ *  * http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
-package com.lssinc.voyage.api.cucumber;
+package com.lssinc.voyage.api.cucumber.stepdef;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lssinc.voyage.api.cucumber.VoyageApiTestingCucumberApplication;
 import com.lssinc.voyage.api.cucumber.domain.AuthenticationJwtToken;
 import com.lssinc.voyage.api.cucumber.util.Utils;
 import com.lssinc.voyage.api.cucumber.util.VoyageConstants;
@@ -89,6 +92,10 @@ public class VoyageApplicationUsersStepdefs {
      * voyage api status
      */
     public static final String VOYAGE_API_STATUS = "status";
+    /**
+     *  http 200 ok
+     */
+    private static final String HTTP_200_OK = null;
     /**
      * .
      * saves the token response
@@ -347,12 +354,12 @@ public class VoyageApplicationUsersStepdefs {
                             String.class);
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.assertTrue(e.getMessage().contains("404"));
+            Assert.fail();
             HTTP_401_UNAUTHORIZED_MESSAGE = e.getMessage();
             // not throwing the exception as its a negative testcase
             return;
         }
-        Assert.fail();
+        Assert.assertNotNull(responseEntityUserList);
     }
 
     /**.
@@ -361,13 +368,26 @@ public class VoyageApplicationUsersStepdefs {
     private String updateRequestBodyFor() {
         JSONObject request = null;
         try {
-            String jsonString = "{\"firstName\":\"FirstName3\","
+           /* String jsonString = "{\"firstName\":\"FirstName3\","
                     + "\"lastName\":\"LastName3\","
                     + "\"password\":\"my-secure-password\","
                     + "\"phones\":[{\"phoneType\":\"MOBILE\","
                     + "\"phoneNumber\":\"6518886021\"}],"
                     + "\"email\":\"FirstName3@app.com\","
-                    + "\"username\":\"FirstName3@app.com\"}";
+                    + "\"username\":\"FirstName3@app.com\"}";*/
+           String jsonString = "{  \n" +
+                   "\t\"firstName\":\"FirstName4\",\n" +
+                   "\t\"lastName\":\"LastName4\",\n" +
+                   "\t\"username\":\"FirstName6@app.com\",\n" +
+                   "\t\"email\":\"FirstName4@app.com\",\n" +
+                   "\t\"password\":\"my-secure-password\",\n" +
+                   "\t\"phones\":[  \n" +
+                   "\t\t{  \n" +
+                   "\t\t \"phoneType\":\"MOBILE\",\n" +
+                   "\t\t \"phoneNumber\":\"6518886021\"\n" +
+                   "\t\t}\n" +
+                   "\t]\n" +
+                   "}";
 
             request = new JSONObject(jsonString);
         } catch (JSONException e) {
@@ -524,6 +544,8 @@ public class VoyageApplicationUsersStepdefs {
             responseEntityUserList = restTemplateBuilder.build()
                     .exchange(arg0, HttpMethod.GET, httpEntity,
                             String.class);
+            Assert.assertTrue(HTTP_200_OK == responseEntityUserList
+                    .getStatusCode().toString().trim());
             /*ObjectMapper mapper = new ObjectMapper();
             String responseBody = responseEntityUserList.getBody();
             InputStream stream = new ByteArrayInputStream(responseBody
@@ -541,8 +563,8 @@ public class VoyageApplicationUsersStepdefs {
     @Then("^I should obtain user details in response$")
     public void iShouldObtainUserDetailsInResponse(String arg0) throws
                                                                Throwable {
-        Assert.assertTrue(HTTP_204_NO_CONTENT ==
-                HttpStatus.NO_CONTENT.toString());
+        Assert.assertTrue(HTTP_200_OK ==
+                HttpStatus.OK.toString());
     }
 
     @When("^user requests for updating \"([^\"]*)\" user details by id$")
