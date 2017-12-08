@@ -32,7 +32,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**.
@@ -81,14 +80,13 @@ public class VoyageApiTestingController {
             "application/xml", "text/html", "text/xml" })
     @ResponseBody
     public ResponseEntity runTestCaseForVoyageAPIAuthenticationToken() {
-        ModelAndView modelAndView = null;
         try {
             serviceRunner.voyageApiAuthenticationRunner();
             serviceRunner.getCucumberReports();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.TEXT_HTML);
-            String url = "http://localhost:8083/cucumber-results-agg-test" +
-                    "-results.html";
+            String url = "http://localhost:8083/cucumber-results-agg-test"
+                    + "-results.html";
             //set response entity
             HttpEntity<Object> entity = new HttpEntity<Object>(headers);
             ResponseEntity<String> responseEntity =
@@ -102,7 +100,6 @@ public class VoyageApiTestingController {
                     .getMessage();
             ResponseEntity entity = new ResponseEntity(message, HttpStatus
                     .INTERNAL_SERVER_ERROR);
-            //modelAndView.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             return entity;
         }
     }

@@ -1,22 +1,20 @@
 /*
+ * Copyright 2017 Lighthouse Software, Inc.   http://www.LighthouseSoftware.com
  *
- *  * Copyright 2017 Lighthouse Software, Inc.   http://www.LighthouseSoftware.com
- *  *
- *  * Licensed to the Apache Software Foundation (ASF) under one or more
- *  * contributor license agreements.  See the NOTICE file distributed with
- *  * this work for additional information regarding copyright ownership.
- *  * The ASF licenses this file to You under the Apache License, Version 2.0
- *  * (the "License"); you may not use this file except in compliance with
- *  * the License.  You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.lssinc.voyage.api.cucumber.stepdef;
 
@@ -335,8 +333,8 @@ public class VoyageApplicationUsersStepdefs {
 
     @Then("^I should obtain the user list$")
     public void iShouldObtainTheUserList(String arg0) throws Throwable {
-        Assert.assertTrue(HttpStatus.BAD_REQUEST.toString().equals
-                (MESSAGE_404_UNAUTHORIZED));
+        Assert.assertTrue(HttpStatus.BAD_REQUEST.toString()
+                .equals(MESSAGE_404_UNAUTHORIZED));
     }
 
     @When("^user requests for \"([^\"]*)\" creating user$")
@@ -368,26 +366,19 @@ public class VoyageApplicationUsersStepdefs {
     private String updateRequestBodyFor() {
         JSONObject request = null;
         try {
-           /* String jsonString = "{\"firstName\":\"FirstName3\","
-                    + "\"lastName\":\"LastName3\","
-                    + "\"password\":\"my-secure-password\","
-                    + "\"phones\":[{\"phoneType\":\"MOBILE\","
-                    + "\"phoneNumber\":\"6518886021\"}],"
-                    + "\"email\":\"FirstName3@app.com\","
-                    + "\"username\":\"FirstName3@app.com\"}";*/
-           String jsonString = "{  \n" +
-                   "\t\"firstName\":\"FirstName4\",\n" +
-                   "\t\"lastName\":\"LastName4\",\n" +
-                   "\t\"username\":\"FirstName6@app.com\",\n" +
-                   "\t\"email\":\"FirstName4@app.com\",\n" +
-                   "\t\"password\":\"my-secure-password\",\n" +
-                   "\t\"phones\":[  \n" +
-                   "\t\t{  \n" +
-                   "\t\t \"phoneType\":\"MOBILE\",\n" +
-                   "\t\t \"phoneNumber\":\"6518886021\"\n" +
-                   "\t\t}\n" +
-                   "\t]\n" +
-                   "}";
+           String jsonString = "{  \n"
+                   + "\t\"firstName\":\"FirstName4\",\n"
+                   + "\t\"lastName\":\"LastName4\",\n"
+                   + "\t\"username\":\"FirstName6@app.com\",\n"
+                   + "\t\"email\":\"FirstName4@app.com\",\n"
+                   + "\t\"password\":\"my-secure-password\",\n"
+                   + "\t\"phones\":[  \n"
+                   + "\t\t{  \n"
+                   + "\t\t \"phoneType\":\"MOBILE\",\n"
+                   + "\t\t \"phoneNumber\":\"6518886021\"\n"
+                   + "\t\t}\n"
+                   + "\t]\n"
+                   + "}";
 
             request = new JSONObject(jsonString);
         } catch (JSONException e) {
@@ -454,8 +445,8 @@ public class VoyageApplicationUsersStepdefs {
     }
 
     @Then("^I should obtain the following for creating user$")
-    public void iShouldObtainTheFollowingForCreatingUser(String arg0) throws
-                                                                      Throwable {
+    public void iShouldObtainTheFollowingForCreatingUser(String arg0)
+            throws Throwable {
         String body = responseEntityUserList.getBody();
         Assert.assertTrue(body.contains("FirstName4@app.com"));
     }
@@ -463,8 +454,9 @@ public class VoyageApplicationUsersStepdefs {
 
     @When("^user requests for \"([^\"]*)\" creating user with missing "
            + "required parameter$")
-    public void userRequestsForCreatingUserWithMissingRequiredParameter
-            (String arg0) throws Throwable {
+    public void
+    userRequestsForCreatingUserWithMissingRequiredParameter(String arg0)
+            throws Throwable {
         String token = responseSaved.toString().substring(TOKEN_BEGIN_INDEX,
                 TOKEN_END_INDEX);
         HttpHeaders headers = Utils
@@ -485,12 +477,11 @@ public class VoyageApplicationUsersStepdefs {
         }
     }
 
-    @Then("^I should obtain the following for creating user with missing " +
-            "required parameter$")
+    @Then("^I should obtain the following for creating user with missing "
+           + "required parameter$")
     public void
     iShouldObtainTheFollowingForCreatingUserWithMissingRequiredParameter
-            (String arg0)
-            throws Throwable {
+            (String arg0) throws Throwable {
         Assert.assertTrue(HTTP_400_MISSING_REQUIRED_PARAMETER.equals("400"));
     }
 
@@ -528,8 +519,8 @@ public class VoyageApplicationUsersStepdefs {
     @Then("^I should obtain the deleted record id in response$")
     public void iShouldObtainTheDeletedRecordIdInResponse(String arg0) throws
                                                                Throwable {
-        Assert.assertTrue(HTTP_204_NO_CONTENT ==
-                HttpStatus.NO_CONTENT.toString());
+        Assert.assertTrue(HTTP_204_NO_CONTENT
+                == HttpStatus.NO_CONTENT.toString());
     }
 
     @When("^user requests for \"([^\"]*)\" user details by id$")
@@ -544,8 +535,9 @@ public class VoyageApplicationUsersStepdefs {
             responseEntityUserList = restTemplateBuilder.build()
                     .exchange(arg0, HttpMethod.GET, httpEntity,
                             String.class);
-            Assert.assertTrue(HTTP_200_OK == responseEntityUserList
-                    .getStatusCode().toString().trim());
+            Assert.assertTrue(HTTP_200_OK
+                    == responseEntityUserList.getStatusCode()
+                    .toString().trim());
             /*ObjectMapper mapper = new ObjectMapper();
             String responseBody = responseEntityUserList.getBody();
             InputStream stream = new ByteArrayInputStream(responseBody
@@ -563,8 +555,8 @@ public class VoyageApplicationUsersStepdefs {
     @Then("^I should obtain user details in response$")
     public void iShouldObtainUserDetailsInResponse(String arg0) throws
                                                                Throwable {
-        Assert.assertTrue(HTTP_200_OK ==
-                HttpStatus.OK.toString());
+        Assert.assertTrue(HTTP_200_OK
+                == HttpStatus.OK.toString());
     }
 
     @When("^user requests for updating \"([^\"]*)\" user details by id$")
@@ -599,7 +591,7 @@ public class VoyageApplicationUsersStepdefs {
     @Then("^I should get the updated user details in response$")
     public void iShouldGetTheUpdatedUserDetailsInResponse(String arg0) throws
                                                                Throwable {
-        Assert.assertTrue(responseEntityUserList.getStatusCode() ==
-                HttpStatus.OK);
+        Assert.assertTrue(responseEntityUserList.getStatusCode()
+                == HttpStatus.OK);
     }
 }

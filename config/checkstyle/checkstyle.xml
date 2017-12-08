@@ -75,19 +75,23 @@
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
 
         <module name="JavadocMethod">
+            <property name="severity" value="ignore"/>
             <property name="excludeScope" value="private"/>
         </module>
 
-        <module name="JavadocType"/>
+        <module name="JavadocType">
+            <property name="severity" value="ignore"/>
+        </module>
 
-       <!-- <module name="JavadocVariable">
+        <module name="JavadocVariable">
+            <property name="severity" value="ignore"/>
             <property name="excludeScope" value="private"/>
-        </module>-->
+        </module>
 
         <module name="JavadocStyle">
             <property name="checkFirstSentence" value="false"/>
             <property name="excludeScope" value="package"/>
-            <property name="allowMissingJavadoc" value="false"/>
+            <!--<property name="allowMissingJavadoc" value="false"/>-->
             <property name="checkEmptyJavadoc" value="false"/>
         </module>
 
@@ -102,15 +106,15 @@
 
         <module name="LocalVariableName"/>
 
-        <module name="MemberName"/>
+        <!--<module name="MemberName"/>-->
 
         <!--<module name="MethodName"/>-->
 
         <module name="PackageName"/>
 
-        <module name="ParameterName"/>
+        <!--<module name="ParameterName"/>-->
 
-        <module name="StaticVariableName"/>
+        <!--<module name="StaticVariableName"/>-->
 
         <module name="TypeName"/>
 
@@ -179,7 +183,7 @@
 
         <module name="GenericWhitespace"/>
 
-        <module name="MethodParamPad"/>
+        <!--<module name="MethodParamPad"/>-->
 
         <module name="NoWhitespaceAfter"/>
 
@@ -230,7 +234,7 @@
 
         <module name="EqualsHashCode"/>
 
-        <module name="HiddenField"/>
+        <!--<module name="HiddenField"/>-->
 
         <module name="IllegalInstantiation"/>
 
@@ -255,7 +259,7 @@
 
         <module name="InterfaceIsType"/>
 
-        <module name="VisibilityModifier"/>
+        <!--<module name="VisibilityModifier"/>-->
 
 
         <!-- Miscellaneous other checks.                   -->

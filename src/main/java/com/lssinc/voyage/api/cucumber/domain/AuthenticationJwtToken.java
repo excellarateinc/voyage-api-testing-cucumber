@@ -41,7 +41,9 @@ public class AuthenticationJwtToken {
 
     private String jti;
 
-    public AuthenticationJwtToken(){}
+    public AuthenticationJwtToken() {
+
+    }
 
 
     public String getAccess_token() {

@@ -1,22 +1,20 @@
 /*
+ * Copyright 2017 Lighthouse Software, Inc.   http://www.LighthouseSoftware.com
  *
- *  * Copyright 2017 Lighthouse Software, Inc.   http://www.LighthouseSoftware.com
- *  *
- *  * Licensed to the Apache Software Foundation (ASF) under one or more
- *  * contributor license agreements.  See the NOTICE file distributed with
- *  * this work for additional information regarding copyright ownership.
- *  * The ASF licenses this file to You under the Apache License, Version 2.0
- *  * (the "License"); you may not use this file except in compliance with
- *  * the License.  You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.lssinc.voyage.api.cucumber.stepdef;
@@ -55,7 +53,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-/**.
+/**
+ * .
  * voyage api authentication token integration test
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -66,98 +65,89 @@ import java.util.Map;
         .WebEnvironment.RANDOM_PORT)
 public class VoyageApplicationAuthenticationStepdefs {
 
-    /**.
+    /**
+     * .
      * OK message for verifying against the successful response
      */
     public static final String OK_200 = "<200 OK";
-
-    /**.
-     *
+    /**
+     * .
+     * oauth2TokenSuccessMessage is used to verifying steps to successful
+     * oAuthToken generation
+     */
+    private static String oauth2TokenSuccessMessage;
+    /**
+     * .
+     * oauth401 is used to verifying step for using invalid bearer token
+     */
+    private static String oauth401UnAuthorizedMessage;
+    /**
+     * .
      */
     @Value("${voyagestepdef.clientidvalue}")
     private String user;
-
-    /**.
-     *
+    /**
+     * .
      */
     @Value("${voyagestepdef.clientsecretvalue}")
     private String password;
-
-    /**.
-     *
+    /**
+     * .
      */
     @Value("${voyagestepdef.oauthtokenurl}")
     private String oAuthTokenUrl;
-
-    /**.
-     *
+    /**
+     * .
      */
     @Value("${voyagestepdef.clientid}")
     private String clientId;
-
-    /**.
-     *
+    /**
+     * .
      */
     @Value("${voyagestepdef.clientidvalue}")
     private String clientIdValue;
-
-    /**.
-     *
+    /**
+     * .
      */
     @Value("${voyagestepdef.clientsercret}")
     private String clientSecret;
-
-    /**.
-     *
+    /**
+     * .
      */
     @Value("${voyagestepdef.clientsecretvalue}")
     private String clientSecretValue;
-
-    /**.
-     *
+    /**
+     * .
      */
     @Value("${voyagestepdef.granttype}")
     private String grantType;
-
-    /**.
-     *
+    /**
+     * .
      */
     @Value("${voyagestepdef.granttypevalue}")
     private String grantTypeValue;
-
-    /**.
-     *
+    /**
+     * .
      */
     @Value("${voyagestepdef.tokenname}")
     private String tokenName;
-
-
-    /**.
-     *
+    /**
+     * .
      */
     @Value("${voyagestepdefinvalidauthtoken.accesstoken}")
     private String invalidAuthTokenAccessToken;
-    /**.
-     *
+    /**
+     * .
      */
     @Value("${voyagestepdefinvalidauthtoken.serviceurlforstatus}")
     private String invalidAuthTokenServiceurlForStatus;
-    /**.
-     *
+    /**
+     * .
      */
     @Value("${voyagestepdefinvalidauthtoken.responsemessage}")
     private String invalidAuthTokenResponseMessage;
-
-
-    /**.
-     * @return RestTemplate
-     */
-
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-    /**.
+    /**
+     * .
      * Rest template used to call rest services from Voyage API
      */
     @Autowired
@@ -167,36 +157,33 @@ public class VoyageApplicationAuthenticationStepdefs {
      */
 
     private RestTemplateBuilder restTemplateBuilder;
-
-    /**.
-     *
+    /**
+     * .
      */
     @Autowired
     private ApplicationContext context;
-
-    /**.
-     *
+    /**
+     * .
      */
     @Autowired
     private Environment environment;
 
-    /**.
-     *  oauth2TokenSuccessMessage is used to verifying steps to successful
-     *  oAuthToken generation
+    /**
+     * .
+     *
+     * @return RestTemplate
      */
-    private static String oauth2TokenSuccessMessage;
 
-    /**.
-     *  oauth401 is used to verifying step for using invalid bearer token
-     */
-    private static String oauth401UnAuthorizedMessage;
-
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 
     @Given("^a Oauth(\\d+) url \"([^\"]*)\"$")
     public void a_Oauth_url(int arg1, String arg2) throws Throwable {
         URI url = null;
         try {
-             url = new URI(arg2);
+            url = new URI(arg2);
         } catch (Exception e) {
             Assert.fail();
             throw e;
@@ -228,7 +215,7 @@ public class VoyageApplicationAuthenticationStepdefs {
     public void iRequestTheOauthTokenFormOfThisUrl(int arg0) throws Throwable {
         ResponseEntity response = null;
         try {
-            response =  getAuthToken();
+            response = getAuthToken();
         } catch (Exception e) {
             Assert.fail();
             throw e;
@@ -245,32 +232,33 @@ public class VoyageApplicationAuthenticationStepdefs {
         ResponseEntity<String> response = null;
         try {
 
-        Map<String, String> propertiesMap = new HashMap<String, String>();
-        propertiesMap.put(VoyageConstants.VOYAGE_API_USER, user);
-        propertiesMap.put(VoyageConstants.VOYAGE_API_USER_PASSWORD, password);
-        propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_ID, clientId);
-        propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_ID_VALUE,
-                clientIdValue);
-        propertiesMap.put(VoyageConstants.VOYAGE_API_USER_PASSWORD,
-                clientSecret);
-        propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_SECRET,
-                clientSecret);
-        propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_SECRET_VALUE,
-                clientSecretValue);
-        propertiesMap.put(VoyageConstants.VOYAGE_API_GRANT_TYPE, grantType);
-        propertiesMap.put(VoyageConstants.VOYAGE_API_GRANT_TYPE_VALUE,
-                grantTypeValue);
-        propertiesMap.put(VoyageConstants.REQUEST_SCOPE, "");
-        propertiesMap.put(VoyageConstants.VOYAGE_API_OAUTH_TOKEN_URL,
-                oAuthTokenUrl);
+            Map<String, String> propertiesMap = new HashMap<String, String>();
+            propertiesMap.put(VoyageConstants.VOYAGE_API_USER, user);
+            propertiesMap.put(VoyageConstants.VOYAGE_API_USER_PASSWORD,
+                    password);
+            propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_ID, clientId);
+            propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_ID_VALUE,
+                    clientIdValue);
+            propertiesMap.put(VoyageConstants.VOYAGE_API_USER_PASSWORD,
+                    clientSecret);
+            propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_SECRET,
+                    clientSecret);
+            propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_SECRET_VALUE,
+                    clientSecretValue);
+            propertiesMap.put(VoyageConstants.VOYAGE_API_GRANT_TYPE, grantType);
+            propertiesMap.put(VoyageConstants.VOYAGE_API_GRANT_TYPE_VALUE,
+                    grantTypeValue);
+            propertiesMap.put(VoyageConstants.REQUEST_SCOPE, "");
+            propertiesMap.put(VoyageConstants.VOYAGE_API_OAUTH_TOKEN_URL,
+                    oAuthTokenUrl);
 
-        HttpEntity httpEntity =
-                 Utils.buildAuthTokenHeadersAndRequestBody(propertiesMap);
+            HttpEntity httpEntity =
+                    Utils.buildAuthTokenHeadersAndRequestBody(propertiesMap);
 
-        RestTemplate restTemplate = restTemplateBuilder.build();
+            RestTemplate restTemplate = restTemplateBuilder.build();
 
-        restTemplate.getInterceptors().add(
-                new BasicAuthorizationInterceptor(user, password));
+            restTemplate.getInterceptors().add(
+                    new BasicAuthorizationInterceptor(user, password));
 
             response =
                     restTemplate.exchange(oAuthTokenUrl, HttpMethod.POST,
@@ -303,14 +291,15 @@ public class VoyageApplicationAuthenticationStepdefs {
 
     @When("^I request the login through JWT token$")
     public void i_request_the_login_through_JWT_token() throws Throwable {
-         HttpHeaders headers =
-                 Utils.buildBasicHttpHeadersForBearerAuthentication(invalidAuthTokenAccessToken);
+        HttpHeaders headers =
+                Utils.buildBasicHttpHeadersForBearerAuthentication(
+                        invalidAuthTokenAccessToken);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         ResponseEntity<String> response = null;
         try {
             response = restTemplateBuilder.build()
-                    .exchange(invalidAuthTokenServiceurlForStatus, HttpMethod.GET, entity,
-                            String.class);
+                    .exchange(invalidAuthTokenServiceurlForStatus,
+                            HttpMethod.GET, entity, String.class);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.assertTrue(e.getMessage().trim().equals(HttpStatus
