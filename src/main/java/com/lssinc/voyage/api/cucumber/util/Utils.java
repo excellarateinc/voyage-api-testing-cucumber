@@ -25,9 +25,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 
 /**.
@@ -120,5 +127,44 @@ public class Utils {
         headers.set(VoyageConstants.AUTHORIZATION_SCHEME, VoyageConstants
                 .BEARER_TOKEN + accessToken);
         return headers;
+    }
+
+    /**
+     * writes the id of the given object at the given file name
+     *
+     * @param filePath file path of the file to be written
+     * @throws IOException
+     */
+    public static void writeIdToFile(String filePath, String body)
+            throws IOException {
+        try {
+            java.io.Writer wr = new FileWriter(filePath);
+            wr.write(body);
+            wr.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * reads the object from a given file object
+     * @param filename
+     * @return
+     */
+    public static String readFile(String filename){
+        List<String> lines = null;
+        String line = null;
+        try {
+            FileReader fileReader = new FileReader(filename);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            lines = new ArrayList<String>();
+            while ((line = bufferedReader.readLine()) != null) {
+                lines.add(line);
+            }
+            bufferedReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Arrays.toString(lines.toArray(new String[lines.size()]));
     }
 }

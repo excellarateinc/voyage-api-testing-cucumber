@@ -24,6 +24,7 @@ import com.lssinc.voyage.api.cucumber.domain.AuthenticationJwtToken;
 import com.lssinc.voyage.api.cucumber.util.Utils;
 import com.lssinc.voyage.api.cucumber.util.VoyageConstants;
 import com.sun.glass.ui.Application;
+
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -56,6 +57,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 
 /**
@@ -94,6 +96,11 @@ public class VoyageApplicationUsersStepdefs {
      *  http 200 ok
      */
     private static final String HTTP_200_OK = null;
+    public static final int MAX_RANDOM_NUMBER = 1000;
+    public static final String DELETE_USER_FILE_INDEX = "deleteUserFileIndex"
+            + ".txt";
+    public static final int BEGIN_INDEX_DELETE_ID = 7;
+    public static final char END_INDEX_DELETE_ID = ',';
     /**
      * .
      * saves the token response
@@ -126,6 +133,10 @@ public class VoyageApplicationUsersStepdefs {
      */
     @Autowired
     private RestTemplateBuilder restTemplateBuilder;
+    /**
+     * Authentication token of voyage application
+     */
+    private static AuthenticationJwtToken authenticationJwtToken;
     /**
      * .
      * application context
@@ -208,6 +219,7 @@ public class VoyageApplicationUsersStepdefs {
     private static String HTTP_401_UNAUTHORIZED;
     private static String HTTP_204_NO_CONTENT;
     private static String MESSAGE_404_UNAUTHORIZED;
+    private static String usernameForInserting;
 
     /**.
      * @return RestTemplate
@@ -261,9 +273,8 @@ public class VoyageApplicationUsersStepdefs {
             String responseBody = response.getBody();
             InputStream stream = new ByteArrayInputStream(responseBody
                     .getBytes(StandardCharsets.UTF_8.name()));
-            AuthenticationJwtToken readValue = mapper.readValue(stream,
-                    AuthenticationJwtToken.class);
-            System.out.print("");
+            authenticationJwtToken = mapper.readValue
+                    (stream, AuthenticationJwtToken.class);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -275,11 +286,10 @@ public class VoyageApplicationUsersStepdefs {
 
     @When("^user requests for list of users \"([^\"]*)\"$")
     public void userRequestsFor(String arg0) throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        String accessToken = getToken();
         String serviceUrlForStatus = arg0;
         HttpHeaders headers = Utils
-                .buildBasicHttpHeadersForBearerAuthentication(accessToken);
+                .buildBasicHttpHeadersForBearerAuthentication
+                        (authenticationJwtToken.getAccess_token());
         HttpEntity<String> entity = new HttpEntity<String>(headers);
 
         try {
@@ -295,21 +305,38 @@ public class VoyageApplicationUsersStepdefs {
         Assert.assertNotNull(responseEntityForUserRequest);
     }
 
-    private String getToken() {
-        int beginIndex = TOKEN_BEGIN_INDEX;
-        int endIndex = TOKEN_END_INDEX;
-        return responseSaved.toString().substring(beginIndex,
-                endIndex);
-    }
-
-
     @Given("^I have a valid jwt token$")
     public void iHaveAValidJwtToken() throws Throwable {
         responseSaved = getAuthToken();
         Assert.assertNotNull(responseSaved);
     }
-    @And("^with users url \"([^\"]*)\"$")
+
+    @And("^with users url for listing users\"([^\"]*)\"$")
     public void withUsersUrl(String arg0) throws Throwable {
+        String token = context.getEnvironment().getProperty(""
+                + "voyagestepdefinvalidauthtoken.accesstoken");
+        HttpHeaders headers = Utils
+                .buildBasicHttpHeadersForBearerAuthentication(token);
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+
+        try {
+            responseEntityUserList = restTemplateBuilder.build()
+                    .exchange(arg0, HttpMethod.GET, entity,
+                            String.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.assertTrue(e.getMessage().trim().equals(HttpStatus
+                    .UNAUTHORIZED.toString()));
+            HTTP_401_UNAUTHORIZED = e.getMessage();
+            // not throwing the exception as its a negative testcase
+            return;
+        }
+        Assert.fail();
+    }
+
+
+    @And("^with users url \"([^\"]*)\"  for listing users$")
+    public void withUsersUrlForListingUsers(String arg0) throws Throwable {
         String token = context.getEnvironment().getProperty(""
                 + "voyagestepdefinvalidauthtoken.accesstoken");
         HttpHeaders headers = Utils
@@ -333,16 +360,16 @@ public class VoyageApplicationUsersStepdefs {
 
     @Then("^I should obtain the user list$")
     public void iShouldObtainTheUserList(String arg0) throws Throwable {
-        Assert.assertTrue(HttpStatus.BAD_REQUEST.toString()
-                .equals(MESSAGE_404_UNAUTHORIZED));
+        Assert.assertTrue(responseEntityForUserRequest.getBody() != null);
     }
 
     @When("^user requests for \"([^\"]*)\" creating user$")
     public void userRequestsForCreatingUser(String arg0) throws Throwable {
-        String token = responseSaved.toString().substring(TOKEN_BEGIN_INDEX,
-                TOKEN_END_INDEX);
         HttpHeaders headers = Utils
-                .buildBasicHttpHeadersForBearerAuthentication(token);
+                .buildBasicHttpHeadersForBearerAuthentication
+                        (authenticationJwtToken.getAccess_token());
+        int randomNumber = getRandomNumber();
+        usernameForInserting = "FirstName" + randomNumber + "@app.com";
         String body =  updateRequestBodyFor();
         HttpEntity<?> httpEntity = new HttpEntity<Object>(body, headers);
 
@@ -350,6 +377,8 @@ public class VoyageApplicationUsersStepdefs {
             responseEntityUserList = restTemplateBuilder.build()
                     .exchange(arg0, HttpMethod.POST, httpEntity,
                             String.class);
+            Utils.writeIdToFile(DELETE_USER_FILE_INDEX, responseEntityUserList
+                    .getBody());
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -358,6 +387,17 @@ public class VoyageApplicationUsersStepdefs {
             return;
         }
         Assert.assertNotNull(responseEntityUserList);
+    }
+
+
+    /**
+     *
+     * @return returns randon number between 1 to 1000
+     */
+    private int getRandomNumber() {
+        int min = 1;
+        Random random = new Random();
+        return min + random.nextInt(MAX_RANDOM_NUMBER);
     }
 
     /**.
@@ -369,8 +409,8 @@ public class VoyageApplicationUsersStepdefs {
            String jsonString = "{  \n"
                    + "\t\"firstName\":\"FirstName4\",\n"
                    + "\t\"lastName\":\"LastName4\",\n"
-                   + "\t\"username\":\"FirstName6@app.com\",\n"
-                   + "\t\"email\":\"FirstName4@app.com\",\n"
+                   + "\t\"username\":" + "\""  + usernameForInserting + "\",\n"
+                   + "\t\"email\":" + "\"" + usernameForInserting + "\",\n"
                    + "\t\"password\":\"my-secure-password\",\n"
                    + "\t\"phones\":[  \n"
                    + "\t\t{  \n"
@@ -395,13 +435,14 @@ public class VoyageApplicationUsersStepdefs {
     private String updateRequestBodyForWithMissingRequiredParameters() {
         JSONObject request = null;
         try {
+
             String jsonString = "{\"firstName\":\"FirstName1\","
                     + "\"lastName\":\"LastName1\","
                     + "\"password\":\"my-secure-password\","
                     + "\"phones\":[{\"phoneType\":\"MOBILE\","
                     + "\"phoneNumber\":null\"}],"
                     + "\"email\":\"FirstName4@app.com\","
-                    + "\"username\":\"FirstName4@app.com\"}";
+                    + "\"username\":usernameForInserting}";
 
             request = new JSONObject(jsonString);
         } catch (JSONException e) {
@@ -447,8 +488,7 @@ public class VoyageApplicationUsersStepdefs {
     @Then("^I should obtain the following for creating user$")
     public void iShouldObtainTheFollowingForCreatingUser(String arg0)
             throws Throwable {
-        String body = responseEntityUserList.getBody();
-        Assert.assertTrue(body.contains("FirstName4@app.com"));
+        Assert.assertTrue(responseEntityUserList.getBody() != null);
     }
 
 
@@ -485,28 +525,27 @@ public class VoyageApplicationUsersStepdefs {
         Assert.assertTrue(HTTP_400_MISSING_REQUIRED_PARAMETER.equals("400"));
     }
 
-    /*@Then("^I should obtain the following for creating user with missing " +
-            "required parameter$")
-    public void
-    iShouldObtainTheFollowingForCreatingUserWithMissingRequiredParameter()
-            throws Throwable {
-        Assert.assertTrue(HTTP_400_MISSING_REQUIRED_PARAMETER.equals("400"));
-    }*/
-
     @When("^user requests for \"([^\"]*)\" deleting user$")
     public void userRequestsForDeletingUser(String arg0) throws Throwable {
         String token = responseSaved.toString().substring(TOKEN_BEGIN_INDEX,
                 TOKEN_END_INDEX);
+        authenticationJwtToken.getAccess_token();
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(token);
-        String deleteRecord = arg0.substring(arg0.lastIndexOf('/') + 1);
-        HttpEntity<?> httpEntity = new HttpEntity<Object>(/*params, */headers);
+        String toBeDeletedRecord = Utils.readFile(DELETE_USER_FILE_INDEX);
 
+        String deleteRecord = toBeDeletedRecord.substring(BEGIN_INDEX_DELETE_ID,
+                toBeDeletedRecord.indexOf(END_INDEX_DELETE_ID));
+        HttpEntity<?> httpEntity = new HttpEntity<Object>(headers);
+
+        arg0 = arg0.substring(0, arg0.lastIndexOf('/') + 1) +  deleteRecord;
         try {
             responseEntityUserList = restTemplateBuilder.build()
                     .exchange(arg0, HttpMethod.DELETE, httpEntity,
                             String.class, deleteRecord);
+            //Utils.writeIdToFile(DELETE_USER_FILE_INDEX,"");
             HttpStatus status = responseEntityUserList.getStatusCode();
+            Assert.assertTrue(status == HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -516,11 +555,13 @@ public class VoyageApplicationUsersStepdefs {
         }
     }
 
+
+
     @Then("^I should obtain the deleted record id in response$")
     public void iShouldObtainTheDeletedRecordIdInResponse(String arg0) throws
                                                                Throwable {
-        Assert.assertTrue(HTTP_204_NO_CONTENT
-                == HttpStatus.NO_CONTENT.toString());
+        Assert.assertTrue(responseEntityUserList.getStatusCode()
+                .toString().equals(HttpStatus.NO_CONTENT.toString()));
     }
 
     @When("^user requests for \"([^\"]*)\" user details by id$")
@@ -535,9 +576,8 @@ public class VoyageApplicationUsersStepdefs {
             responseEntityUserList = restTemplateBuilder.build()
                     .exchange(arg0, HttpMethod.GET, httpEntity,
                             String.class);
-            Assert.assertTrue(HTTP_200_OK
-                    == responseEntityUserList.getStatusCode()
-                    .toString().trim());
+            Assert.assertTrue(HttpStatus.OK.toString().equals(
+                    responseEntityUserList.getStatusCode().toString().trim()));
             /*ObjectMapper mapper = new ObjectMapper();
             String responseBody = responseEntityUserList.getBody();
             InputStream stream = new ByteArrayInputStream(responseBody
@@ -555,8 +595,8 @@ public class VoyageApplicationUsersStepdefs {
     @Then("^I should obtain user details in response$")
     public void iShouldObtainUserDetailsInResponse(String arg0) throws
                                                                Throwable {
-        Assert.assertTrue(HTTP_200_OK
-                == HttpStatus.OK.toString());
+        Assert.assertTrue(HttpStatus.OK.toString().equals(
+                responseEntityUserList.getStatusCode().toString().trim()));
     }
 
     @When("^user requests for updating \"([^\"]*)\" user details by id$")
@@ -582,16 +622,11 @@ public class VoyageApplicationUsersStepdefs {
         Assert.assertNotNull(responseEntityUserList);
     }
 
-    /*@Then("^I should get the updated user details in response$")
-    public void iShouldGetTheUpdatedUserDetailsInResponse() throws Throwable {
-        Assert.assertTrue(responseEntityUserList.getStatusCode() ==
-                HttpStatus.OK);
-    }*/
-
     @Then("^I should get the updated user details in response$")
     public void iShouldGetTheUpdatedUserDetailsInResponse(String arg0) throws
                                                                Throwable {
         Assert.assertTrue(responseEntityUserList.getStatusCode()
                 == HttpStatus.OK);
     }
+
 }

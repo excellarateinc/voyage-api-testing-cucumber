@@ -19,7 +19,9 @@
 
 package com.lssinc.voyage.api.cucumber.stepdef;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lssinc.voyage.api.cucumber.VoyageApiTestingCucumberApplication;
+import com.lssinc.voyage.api.cucumber.domain.AuthenticationJwtToken;
 import com.lssinc.voyage.api.cucumber.util.Utils;
 import com.lssinc.voyage.api.cucumber.util.VoyageConstants;
 import com.sun.glass.ui.Application;
@@ -46,6 +48,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -117,8 +122,12 @@ public class VoyageApplicationGetStatusStepdefs {
      */
     @Autowired
     private ApplicationContext context;
-    /**.
-     *
+    /**
+     * Authentication token of voyage application
+     */
+    private static AuthenticationJwtToken authenticationJwtToken;
+    /**
+     * client id value
      */
     @Value("${voyagestepdef.clientidvalue}")
     private String user;
@@ -218,6 +227,14 @@ public class VoyageApplicationGetStatusStepdefs {
                     restTemplate.exchange(oAuthTokenUrl, HttpMethod.POST,
                             httpEntity,
                             String.class);
+
+
+            ObjectMapper mapper = new ObjectMapper();
+            String responseBody = response.getBody();
+            InputStream stream = new ByteArrayInputStream(responseBody
+                    .getBytes(StandardCharsets.UTF_8.name()));
+            authenticationJwtToken = mapper.readValue
+                    (stream, AuthenticationJwtToken.class);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -238,19 +255,16 @@ public class VoyageApplicationGetStatusStepdefs {
         }
         OAUTH2_SUCCESS_MESSAGE = HttpStatus.OK.toString();
         Assert.assertNotNull(responseToken);
-        Assert.assertTrue(responseToken.toString().startsWith(MESSAGE_OK_200));
+        Assert.assertTrue(responseToken.getStatusCode().toString().equals
+                (HttpStatus.OK.toString()));
     }
 
     @When("^user requests for \"([^\"]*)\"$")
     public void userRequestsFor(String arg0) throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        int beginIndex = TOKEN_BEGIN_INDEX;
-        int endIndex = TOKEN_END_INDEX;
-        String accessToken = responseToken.toString().substring(beginIndex,
-                endIndex);
         String serviceUrlForStatus = arg0;
         HttpHeaders headers = Utils
-                .buildBasicHttpHeadersForBearerAuthentication(accessToken);
+                .buildBasicHttpHeadersForBearerAuthentication
+                        (authenticationJwtToken.getAccess_token());
         HttpEntity<String> entity = new HttpEntity<String>(headers);
 
         try {

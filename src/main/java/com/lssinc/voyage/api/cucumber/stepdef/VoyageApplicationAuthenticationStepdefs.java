@@ -19,7 +19,9 @@
 
 package com.lssinc.voyage.api.cucumber.stepdef;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lssinc.voyage.api.cucumber.VoyageApiTestingCucumberApplication;
+import com.lssinc.voyage.api.cucumber.domain.AuthenticationJwtToken;
 import com.lssinc.voyage.api.cucumber.util.Utils;
 import com.lssinc.voyage.api.cucumber.util.VoyageConstants;
 import com.sun.glass.ui.Application;
@@ -48,7 +50,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -81,6 +86,10 @@ public class VoyageApplicationAuthenticationStepdefs {
      * oauth401 is used to verifying step for using invalid bearer token
      */
     private static String oauth401UnAuthorizedMessage;
+    /**
+     * Authentication token of voyage application
+     */
+    private static AuthenticationJwtToken authenticationJwtToken;
     /**
      * .
      */
@@ -264,6 +273,13 @@ public class VoyageApplicationAuthenticationStepdefs {
                     restTemplate.exchange(oAuthTokenUrl, HttpMethod.POST,
                             httpEntity,
                             String.class);
+
+            ObjectMapper mapper = new ObjectMapper();
+            String responseBody = response.getBody();
+            InputStream stream = new ByteArrayInputStream(responseBody
+                    .getBytes(StandardCharsets.UTF_8.name()));
+            authenticationJwtToken = mapper.readValue
+                    (stream, AuthenticationJwtToken.class);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
