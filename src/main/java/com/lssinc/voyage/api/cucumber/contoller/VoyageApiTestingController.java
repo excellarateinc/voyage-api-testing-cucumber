@@ -60,7 +60,7 @@ public class VoyageApiTestingController {
     private CucumberRunnerService serviceRunner;
     /**
      * @return ResponseEntity - json response
-     * @api {get} /automation/generatetoken voyage automation for
+     * @api {get} /automation/runIntegrationTesting voyage automation for
      * runTestCaseForVoyageAPIAuthenticationToken
      * @apiVersion 1.0.0
      * @apiName runTestCaseForVoyageAPIAuthenticationToken
@@ -73,10 +73,10 @@ public class VoyageApiTestingController {
      * @apiHeaderExample {json} Voyage API Authentication Token Test
      * HTTP/1.1 201: Created
      * {
-     * "Location": "https://my-app/api/v1/automation/generatetoken"
+     * "Location": "https://my-app/api/v1/automation/runIntegrationTesting"
      * }
      **/
-    @RequestMapping(value = "/automation/generatetoken", produces = {
+    @RequestMapping(value = "/automation/runIntegrationTesting", produces = {
             "application/xml", "text/html", "text/xml" })
     @ResponseBody
     public ResponseEntity runTestCaseForVoyageAPIAuthenticationToken() {
