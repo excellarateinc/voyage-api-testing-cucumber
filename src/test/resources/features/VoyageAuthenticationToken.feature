@@ -1,4 +1,4 @@
-Feature: SpecFlowFeatureOauth2TokenRequest
+Feature: Feature Oauth2Token Request
   In order to authenticate a user
   As a user of voyage application
   I want to generate jwt toke to access resources

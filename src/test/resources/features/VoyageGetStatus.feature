@@ -1,4 +1,4 @@
-Feature: SpecFlowFeatureGetStatus
+Feature: Feature Status
   In order to get status of the application
   As a user of voyage application
   I want to see the application status

@@ -1,4 +1,4 @@
-Feature: SpecFlowFeatureGetStatus
+Feature: Feature Users
   In order to get user information
   As a user of voyage application
   I want to see the user related information

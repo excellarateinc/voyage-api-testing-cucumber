@@ -151,7 +151,7 @@ public class Utils {
      * @param filename
      * @return
      */
-    public static String readFile(String filename){
+    public static String readFile(String filename) {
         List<String> lines = null;
         String line = null;
         try {

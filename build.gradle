@@ -28,6 +28,7 @@ apply plugin: 'pmd'
 apply plugin: 'findbugs'
 apply plugin: 'maven'
 apply plugin: 'ManifestClasspath'
+apply plugin: 'base'
 
 
 group = 'voyage-api-testing-cucumber'
@@ -182,6 +183,13 @@ tasks.withType(Pmd) {
 
 }
 
+// ****************************************************************************
+// enable PDM
+// ****************************************************************************
+clean.doFirst {
+    delete "${rootDir}/src/main/resources/static/"
+    println "${rootDir}/src/main/resources/static/"
+}
 
 // ****************************************************************************
 // Pass environment variables to Spring BootRun task when running from Gradle

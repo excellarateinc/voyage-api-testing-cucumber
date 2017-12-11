@@ -1,22 +1,20 @@
 /*
+ * Copyright 2017 Lighthouse Software, Inc.   http://www.LighthouseSoftware.com
  *
- *  * Copyright 2017 Lighthouse Software, Inc.   http://www.LighthouseSoftware.com
- *  *
- *  * Licensed to the Apache Software Foundation (ASF) under one or more
- *  * contributor license agreements.  See the NOTICE file distributed with
- *  * this work for additional information regarding copyright ownership.
- *  * The ASF licenses this file to You under the Apache License, Version 2.0
- *  * (the "License"); you may not use this file except in compliance with
- *  * the License.  You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.lssinc.voyage.api.cucumber.stepdef;
 
@@ -26,7 +24,6 @@ import com.lssinc.voyage.api.cucumber.domain.AuthenticationJwtToken;
 import com.lssinc.voyage.api.cucumber.util.Utils;
 import com.lssinc.voyage.api.cucumber.util.VoyageConstants;
 import com.sun.glass.ui.Application;
-import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -52,7 +49,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
 
-import javax.validation.constraints.AssertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -123,7 +119,8 @@ public class VoyageApplicationRolesStepdefs {
      * stores the response entity for user request test case, it will be used
      * in the next test case
      */
-    private static ResponseEntity<String> responseEntityForUserRolesRequest = null;
+    private static ResponseEntity<String>
+            responseEntityForUserRolesRequest = null;
     /**.
      *
      */
@@ -332,10 +329,10 @@ public class VoyageApplicationRolesStepdefs {
 
     private String updateRequestBodyForUpdating() {
 
-        String body = "{\n" +
-                "    \"name\": \"Super2 User2\",\n" +
-                "    \"authority\": \"role.super\"\n" +
-                "}";
+        String body = "{\n"
+               + "    \"name\": \"Super2 User2\",\n"
+               +  "    \"authority\": \"role.super\"\n"
+               +  "}";
         return body;
     }
 
@@ -350,7 +347,8 @@ public class VoyageApplicationRolesStepdefs {
     @Then("^I should obtain the user roles$")
     public void iShouldObtainTheUserRoleList(String arg0) throws Throwable {
         Assert.assertNotNull(responseEntityForUserRolesRequest);
-        Assert.assertTrue(responseEntityForUserRolesRequest.getBody().length() > 0);
+        Assert.assertTrue(
+           responseEntityForUserRolesRequest.getBody().length() > 0);
     }
 
     @And("^with users url \"([^\"]*)\"$")
@@ -446,7 +444,8 @@ public class VoyageApplicationRolesStepdefs {
                         authenticationJwtToken.getAccess_token());
         String toBeDeletedRecord = Utils.readFile(DELETE_ROLES_INDEX_FILE);
 
-        String deleteRecord = toBeDeletedRecord.substring(BEGIN_INDEX_DELETE_ID,
+        String deleteRecord = toBeDeletedRecord.substring(
+                BEGIN_INDEX_DELETE_ID,
                 toBeDeletedRecord.indexOf(END_INDEX_DELETE_ID));
         arg0 = arg0.substring(0, arg0.lastIndexOf('/') + 1) +  deleteRecord;
         HttpEntity<Object> entity = new HttpEntity<Object>(headers);
@@ -456,7 +455,7 @@ public class VoyageApplicationRolesStepdefs {
                     .exchange(arg0, HttpMethod.DELETE, entity,
                             String.class);
             responseEntityForUserRolesRequest.getStatusCode();
-            //Utils.writeIdToFile(DELETE_ROLES_INDEX_FILE,"");
+            Utils.writeIdToFile(DELETE_ROLES_INDEX_FILE, "");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -467,7 +466,7 @@ public class VoyageApplicationRolesStepdefs {
         Assert.assertNotNull(responseEntityForUserRolesRequest);
     }
 
-    @Then("^I get a role is deleted response$")
+    @Then("^I get a role cannot be deleted response$")
     public void iGetARoleIsDeletedResponse() throws Throwable {
         Assert.assertNotNull(responseEntityForUserRolesRequest);
         Assert.assertTrue(responseEntityForUserRolesRequest.getStatusCode()
