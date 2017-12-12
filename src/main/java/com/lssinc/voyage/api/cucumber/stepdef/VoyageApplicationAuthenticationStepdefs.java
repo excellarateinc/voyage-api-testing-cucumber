@@ -19,7 +19,6 @@
 
 package com.lssinc.voyage.api.cucumber.stepdef;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lssinc.voyage.api.cucumber.VoyageApiTestingCucumberApplication;
 import com.lssinc.voyage.api.cucumber.domain.AuthenticationJwtToken;
 import com.lssinc.voyage.api.cucumber.util.Utils;
@@ -36,9 +35,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -50,10 +47,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,22 +64,15 @@ import java.util.Map;
         .WebEnvironment.RANDOM_PORT)
 public class VoyageApplicationAuthenticationStepdefs {
 
+    /**.
+     *  oauth2 authentication response
+     */
+    private static ResponseEntity<String> authenticationResponse;
     /**
      * .
-     * OK message for verifying against the successful response
+     *  is used to verifying step for using invalid bearer token
      */
-    public static final String OK_200 = "<200 OK";
-    /**
-     * .
-     * oauth2TokenSuccessMessage is used to verifying steps to successful
-     * oAuthToken generation
-     */
-    private static String oauth2TokenSuccessMessage;
-    /**
-     * .
-     * oauth401 is used to verifying step for using invalid bearer token
-     */
-    private static String oauth401UnAuthorizedMessage;
+    private static String HTTP_401_UNAUTHORIZED_MESSAGE;
     /**
      * Authentication token of voyage application
      */
@@ -155,27 +142,12 @@ public class VoyageApplicationAuthenticationStepdefs {
      */
     @Value("${voyagestepdefinvalidauthtoken.responsemessage}")
     private String invalidAuthTokenResponseMessage;
-    /**
-     * .
-     * Rest template used to call rest services from Voyage API
-     */
-    @Autowired
     /**.
-     *
+     * rest template used to call rest services from Voyage API
      * @return RestTemplate
      */
-
+    @Autowired
     private RestTemplateBuilder restTemplateBuilder;
-    /**
-     * .
-     */
-    @Autowired
-    private ApplicationContext context;
-    /**
-     * .
-     */
-    @Autowired
-    private Environment environment;
 
     /**
      * .
@@ -222,16 +194,15 @@ public class VoyageApplicationAuthenticationStepdefs {
 
     @When("^I request the 'Oauth(\\d+)' token form of this url$")
     public void iRequestTheOauthTokenFormOfThisUrl(int arg0) throws Throwable {
-        ResponseEntity response = null;
         try {
-            response = getAuthToken();
+            authenticationResponse = getAuthToken();
         } catch (Exception e) {
             Assert.fail();
             throw e;
         }
-        Assert.assertNotNull(response);
-        Assert.assertTrue(response.toString().startsWith(OK_200));
-        oauth2TokenSuccessMessage = HttpStatus.OK.toString();
+        Assert.assertNotNull(authenticationResponse);
+        Assert.assertTrue(authenticationResponse.getStatusCode()
+                == HttpStatus.OK);
     }
 
     /**
@@ -273,13 +244,7 @@ public class VoyageApplicationAuthenticationStepdefs {
                     restTemplate.exchange(oAuthTokenUrl, HttpMethod.POST,
                             httpEntity,
                             String.class);
-
-            ObjectMapper mapper = new ObjectMapper();
-            String responseBody = response.getBody();
-            InputStream stream = new ByteArrayInputStream(responseBody
-                    .getBytes(StandardCharsets.UTF_8.name()));
-            authenticationJwtToken = mapper.readValue
-                    (stream, AuthenticationJwtToken.class);
+            authenticationJwtToken = Utils.getAuthenticationJwtToken(response);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -291,8 +256,8 @@ public class VoyageApplicationAuthenticationStepdefs {
     @Then("^I should obtain the following JSON message \"([^\"]*)\"$")
     public void i_should_obtain_the_following_JSON_message(String arg1)
             throws Throwable {
-        Assert.assertEquals(oauth2TokenSuccessMessage, HttpStatus.OK
-                .toString());
+        Assert.assertEquals(authenticationResponse.getStatusCode().toString(),
+                HttpStatus.OK.toString());
     }
 
     @Given("^an access_token \"([^\"]*)\"$")
@@ -300,8 +265,8 @@ public class VoyageApplicationAuthenticationStepdefs {
         Assert.assertEquals(invalidAuthTokenAccessToken, arg1);
     }
 
-    @Given("^with \"([^\"]*)\"$")
-    public void with(String arg1) throws Throwable {
+    @And("^with url \"([^\"]*)\"$")
+    public void withUrl(String arg1) throws Throwable {
         Assert.assertEquals(invalidAuthTokenServiceurlForStatus, arg1);
     }
 
@@ -311,25 +276,31 @@ public class VoyageApplicationAuthenticationStepdefs {
                 Utils.buildBasicHttpHeadersForBearerAuthentication(
                         invalidAuthTokenAccessToken);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
-        ResponseEntity<String> response = null;
+
         try {
-            response = restTemplateBuilder.build()
+            authenticationResponse = restTemplateBuilder.build()
                     .exchange(invalidAuthTokenServiceurlForStatus,
                             HttpMethod.GET, entity, String.class);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.assertTrue(e.getMessage().trim().equals(HttpStatus
                     .UNAUTHORIZED.toString()));
-            oauth401UnAuthorizedMessage = e.getMessage();
+            HTTP_401_UNAUTHORIZED_MESSAGE = e.getMessage().trim();
+            if (authenticationResponse == null) {
+                authenticationResponse = new ResponseEntity<String>(HttpStatus
+                        .UNAUTHORIZED);
+            }
             // not throwing the exception as its a negative testcase
             return;
         }
         Assert.fail();
     }
 
-    @Then("^I should get a failed login message \"([^\"]*)\"$")
+    @Then("^I should get a failed login message for authentication \"([^\"]*)"
+            + "\"$")
     public void iShouldGetAFailedLoginMessage(String arg0) throws Throwable {
-        Assert.assertTrue(oauth401UnAuthorizedMessage.startsWith("401"));
+        Assert.assertTrue(HTTP_401_UNAUTHORIZED_MESSAGE
+                .equals(HttpStatus.UNAUTHORIZED.toString()));
     }
 
     @And("^with Client Secret \"([^\"]*)\"$")
@@ -342,4 +313,26 @@ public class VoyageApplicationAuthenticationStepdefs {
         Assert.assertEquals(grantTypeValue, arg0);
     }
 
+    @When("^I request the login through JWT token for authentication$")
+    public void iRequestTheLoginThroughJWTTokenForAuthentication() throws
+                                                                   Throwable {
+        HttpHeaders headers =
+                Utils.buildBasicHttpHeadersForBearerAuthentication(
+                        invalidAuthTokenAccessToken);
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+
+        try {
+            authenticationResponse = restTemplateBuilder.build()
+                    .exchange(invalidAuthTokenServiceurlForStatus,
+                            HttpMethod.GET, entity, String.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.assertTrue(e.getMessage().trim().equals(HttpStatus
+                    .UNAUTHORIZED.toString()));
+            HTTP_401_UNAUTHORIZED_MESSAGE = e.getMessage().trim();
+            // not throwing the exception as its a negative testcase
+            return;
+        }
+        Assert.fail();
+    }
 }

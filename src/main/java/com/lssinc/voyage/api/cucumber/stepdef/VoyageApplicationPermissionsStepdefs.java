@@ -61,11 +61,17 @@ import java.util.Map;
 @WebAppConfiguration
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest
         .WebEnvironment.RANDOM_PORT)
-public class VoyageApplicationRolesStepdefs {
+public class VoyageApplicationPermissionsStepdefs {
+    /**
+     * .
+     *  used to verifying step for using invalid bearer token
+     */
+    private static String HTTP_401_UNAUTHORIZED_MESSAGE;
     /**
      * stored the index of the role that needs to be deleted
      */
-    public static final String DELETE_ROLES_INDEX_FILE = "deleteRolesIndexFile";
+    public static final String DELETE_PERMISSIONS_INDEX_FILE =
+            "deletePermissionsIndexFile";
     /**
      * end index to find the inserted/ to be deleted record id
      */
@@ -73,7 +79,7 @@ public class VoyageApplicationRolesStepdefs {
     /**
      * starting index to find the inserted/ to be deleted record id
      */
-    public static final char BEGIN_INDEX_OF_COLON = ':';
+    private static final char BEGIN_INDEX_OF_COLON = ':';
     /**
      * .
      * saves the token response
@@ -81,16 +87,11 @@ public class VoyageApplicationRolesStepdefs {
     private static ResponseEntity responseSaved = null;
     /**
      * .
-     *  used to verifying step for using invalid bearer token
-     */
-    private static String HTTP_401_UNAUTHORIZED_MESSAGE;
-    /**
-     * .
      * stores the response entity for user request test case, it will be used
      * in the next test case
      */
     private static ResponseEntity<String>
-            responseEntityForUserRolesRequest = null;
+            responseEntityForUserPermissionsRequest = null;
     /**.
      *
      */
@@ -162,14 +163,14 @@ public class VoyageApplicationRolesStepdefs {
     /**.
      *
      */
-    @Value("${voyagestepdef.granttypevalue}")
+    @Value("${voyagestepdefinvalidauthtoken.accesstoken}")
     private String accessToken;
 
     /**.
      *
      */
-    @Value("${voyagestepdefinvalidauthtoken.serviceurlforoles}")
-    private String serviceUrlForRoles;
+    @Value("${voyagestepdefinvalidauthtoken.serviceurlfopermissions}")
+    private String serviceUrlForPermissions;
     /**
      * .
      */
@@ -196,6 +197,12 @@ public class VoyageApplicationRolesStepdefs {
     /**.
      * @return response entity of successful generated token
      */
+
+    public void init() throws Exception {
+        ResponseEntity token = getAuthToken();
+
+    }
+
     private ResponseEntity getAuthToken() throws Exception {
         ResponseEntity<String> response = null;
         try {
@@ -241,15 +248,16 @@ public class VoyageApplicationRolesStepdefs {
         return response;
     }
 
-
-    @Given("^user has a valid jwt token$")
-    public void userHasAValidJwtToken() throws Throwable {
-       Assert.assertNotNull(authenticationJwtToken);
+    @Given("^user has a valid jwt token for permissions$")
+    public void userHasAValidJwtTokenForPermissions() throws Throwable {
+        responseSaved = getAuthToken();
+        Assert.assertNotNull(responseSaved);
         Assert.assertNotNull(authenticationJwtToken.getAccess_token());
     }
 
-    @When("^user requests for list of user roles \"([^\"]*)\"$")
-    public void userRequestsForListOfUserRoles(String arg0) throws Throwable {
+    @When("^user requests for list of user permissions \"([^\"]*)\"$")
+    public void userRequestsForListOfUserPermissions(String arg0) throws
+                                                                  Throwable {
         String serviceUrlForStatus = arg0;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
@@ -257,56 +265,172 @@ public class VoyageApplicationRolesStepdefs {
         HttpEntity<String> entity = new HttpEntity<String>(headers);
 
         try {
-            responseEntityForUserRolesRequest = restTemplateBuilder.build()
+            responseEntityForUserPermissionsRequest =
+                    restTemplateBuilder.build()
                     .exchange(serviceUrlForStatus, HttpMethod.GET, entity,
                             String.class);
         } catch (Exception e) {
             e.printStackTrace();
-            HTTP_401_UNAUTHORIZED_MESSAGE = e.getMessage().trim();
             Assert.fail();
             // not throwing the exception as its a negative testcase
         }
-        Assert.assertNotNull(responseEntityForUserRolesRequest);
+        Assert.assertNotNull(responseEntityForUserPermissionsRequest);
     }
 
-    private String updateRequestBodyForUpdating() {
-
-        String body = "{\n"
-               + "    \"name\": \"Super2 User2\",\n"
-               +  "    \"authority\": \"role.super\"\n"
-               +  "}";
-        return body;
+    @Then("^I should obtain the user permissions$")
+    public void iShouldObtainTheUserPermissions(String arg0) throws Throwable {
+        Assert.assertTrue(responseEntityForUserPermissionsRequest
+                .getStatusCode() == HttpStatus.OK);
     }
 
-
-    @Given("^user has a valid jwt token for roles$")
-    public void userHasAValidJwtTokenForRoles() throws Throwable {
-        responseSaved = getAuthToken();
-        Assert.assertNotNull(responseSaved);
-        Assert.assertNotNull(authenticationJwtToken.getAccess_token());
-    }
-
-    @Then("^I should obtain the user roles$")
-    public void iShouldObtainTheUserRoleList(String arg0) throws Throwable {
-        Assert.assertNotNull(responseEntityForUserRolesRequest);
-        Assert.assertTrue(
-           responseEntityForUserRolesRequest.getBody().length() > 0);
-    }
-
-    @And("^with users url \"([^\"]*)\"$")
-    public void withUsersUrl(String arg0) throws Throwable {
-        // invalid jwt token
+    @When("^user requests for user permissions \"([^\"]*)\"$")
+    public void userRequestsForUserPermissions(String arg0) throws Throwable {
         String serviceUrlForStatus = arg0;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
-                        invalidAuthTokenAccessToken);
+                        authenticationJwtToken.getAccess_token());
         HttpEntity<String> entity = new HttpEntity<String>(headers);
 
         try {
-            responseEntityForUserRolesRequest = restTemplateBuilder.build()
+            responseEntityForUserPermissionsRequest =
+                    restTemplateBuilder.build()
                     .exchange(serviceUrlForStatus, HttpMethod.GET, entity,
                             String.class);
         } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+            // not throwing the exception as its a negative testcase
+        }
+        Assert.assertNotNull(responseEntityForUserPermissionsRequest);
+    }
+
+    @Then("^I should obtain the user permissions by id$")
+    public void iShouldObtainTheUserPermissionsById(String arg0) throws
+                                                               Throwable {
+        Assert.assertTrue(responseEntityForUserPermissionsRequest
+                .getStatusCode() == HttpStatus.OK);
+        Assert.assertTrue(responseEntityForUserPermissionsRequest
+                .getBody() != null);
+    }
+
+    @When("^user requests for adding a new user permission \"([^\"]*)\"$")
+    public void userRequestsForAddingANewUserPermission(String arg0)
+            throws Throwable {
+        String serviceUrlForStatus = arg0;
+        HttpHeaders headers = Utils
+                .buildBasicHttpHeadersForBearerAuthentication(
+                        authenticationJwtToken.getAccess_token());
+        String body = updateRequestBodyForUpdating();
+        HttpEntity<Object> entity = new HttpEntity<Object>(body, headers);
+
+        try {
+            responseEntityForUserPermissionsRequest =
+                    restTemplateBuilder.build()
+                    .exchange(serviceUrlForStatus, HttpMethod.POST, entity,
+                            String.class);
+            Utils.writeIdToFile(DELETE_PERMISSIONS_INDEX_FILE,
+                    responseEntityForUserPermissionsRequest.getBody());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+            // not throwing the exception as its a negative testcase
+        }
+        Assert.assertNotNull(responseEntityForUserPermissionsRequest);
+    }
+
+    /**
+     *
+     * @return returns the new object for inserting
+     */
+    private String updateRequestBodyForUpdating() {
+        String body = "{\"name\":\"api.users.list1\",\"description\":\"/users"
+                + " GET web service endpoint to return a full list of users\","
+                + "\"isImmutable\":true}";
+        return body;
+    }
+
+    @Then("^I get the new permission id in response$")
+    public void iGetTheNewPermissionIdInResponse(String arg0)
+            throws Throwable {
+        Assert.assertNotNull(responseEntityForUserPermissionsRequest);
+        Assert.assertTrue(
+                responseEntityForUserPermissionsRequest.getStatusCode()
+                .toString().equals(HttpStatus.CREATED.toString()));
+    }
+
+    @When("^user requests for deleting a permission \"([^\"]*)\"$")
+    public void userRequestsForDeletingAPermission(String arg0)
+            throws Throwable {
+        HttpHeaders headers = Utils
+                .buildBasicHttpHeadersForBearerAuthentication(
+                        authenticationJwtToken.getAccess_token());
+        String toBeDeletedRecord =
+                Utils.readFile(DELETE_PERMISSIONS_INDEX_FILE);
+
+        String deleteRecord = toBeDeletedRecord.substring(
+                toBeDeletedRecord.indexOf(BEGIN_INDEX_OF_COLON) + 1,
+                toBeDeletedRecord.indexOf(END_INDEX_DELETE_ID));
+        arg0 = arg0.substring(0, arg0.lastIndexOf('/') + 1) +  deleteRecord;
+        HttpEntity<Object> entity = new HttpEntity<Object>(headers);
+
+        try {
+            responseEntityForUserPermissionsRequest =
+                    restTemplateBuilder.build()
+                    .exchange(arg0, HttpMethod.DELETE, entity,
+                            String.class);
+            Utils.writeIdToFile(DELETE_PERMISSIONS_INDEX_FILE, "");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.assertTrue(responseEntityForUserPermissionsRequest
+                    .getStatusCode().toString().equals(HttpStatus.CREATED
+                            .toString()));
+            // once the record is created it will be able to delete this as
+            // it is throwing 'The requested record is immutable. No changes
+            // to this record are allowed.' exception, in future its going to
+            // be deleted as per http exception 201
+            return;
+            // not throwing the exception as its a negative testcase
+        }
+        Assert.fail();
+    }
+
+    @Then("^I get a permission is deleted response$")
+    public void iGetAPermissionIsDeletedResponse() throws Throwable {
+        Assert.assertNotNull(responseEntityForUserPermissionsRequest);
+        Assert.assertTrue(
+                responseEntityForUserPermissionsRequest.getStatusCode()
+                        .toString().equals(HttpStatus.CREATED.toString()));
+    }
+
+    @Given("^an access_token for permissions \"([^\"]*)\"$")
+    public void anAccess_tokenForPermissions(String arg0) throws Throwable {
+        Assert.assertTrue(arg0 != null);
+    }
+
+    @And("^with users url for permissions \"([^\"]*)\"$")
+    public void withUsersUrlForPermissions(String arg0) throws Throwable {
+        Assert.assertTrue(arg0 != null);
+    }
+
+
+
+    @When("^I request the login through JWT token for permissions$")
+    public void iRequestTheLoginThroughJWTTokenForPermissions() throws
+                                                                Throwable {
+        HttpHeaders headers = Utils
+                .buildBasicHttpHeadersForBearerAuthentication(
+                        accessToken);
+        HttpEntity<Object> entity = new HttpEntity<Object>(headers);
+
+        try {
+            responseEntityForUserPermissionsRequest =
+                    restTemplateBuilder.build()
+                            .exchange(serviceUrlForPermissions,
+                                    HttpMethod.DELETE, entity, String.class);
+
+        } catch (Exception e) {
+            e.printStackTrace();
             e.printStackTrace();
             Assert.assertTrue(e.getMessage().trim()
                     .equals(HttpStatus.UNAUTHORIZED
@@ -316,115 +440,14 @@ public class VoyageApplicationRolesStepdefs {
             // not throwing the exception as its a negative testcase
         }
         Assert.fail();
-        Assert.assertNotNull(responseEntityForUserRolesRequest);
     }
 
-    @When("^user requests for user roles \"([^\"]*)\"$")
-    public void userRequestsForUserRoles(String arg0) throws Throwable {
-        String serviceUrlForStatus = arg0;
-        HttpHeaders headers = Utils
-                .buildBasicHttpHeadersForBearerAuthentication(
-                        authenticationJwtToken.getAccess_token());
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
-
-        try {
-            responseEntityForUserRolesRequest = restTemplateBuilder.build()
-                    .exchange(serviceUrlForStatus, HttpMethod.GET, entity,
-                            String.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail();
-            return;
-            // not throwing the exception as its a negative testcase
-        }
-        Assert.assertNotNull(responseEntityForUserRolesRequest);
+    @Then("^I should get a failed login message for permission \"([^\"]*)"
+            + "\"$")
+    public void iShouldGetAFailedLoginMessageForPermission(String arg0)
+            throws Throwable {
+        Assert.assertTrue(HTTP_401_UNAUTHORIZED_MESSAGE.equals(HttpStatus
+                .UNAUTHORIZED.toString()));
     }
 
-    @Then("^I should obtain the user role by id$")
-    public void iShouldObtainTheUserRoleById(String arg0) throws Throwable {
-        Assert.assertNotNull(responseEntityForUserRolesRequest);
-    }
-
-    @When("^user requests for adding a new roles \"([^\"]*)\"$")
-    public void userRequestsForAddingANewRoles(String arg0) throws Throwable {
-        String serviceUrlForStatus = arg0;
-        HttpHeaders headers = Utils
-                .buildBasicHttpHeadersForBearerAuthentication(
-                        authenticationJwtToken.getAccess_token());
-        String body =  updateRequestBodyForUpdating();
-        HttpEntity<Object> entity = new HttpEntity<Object>(body, headers);
-
-        try {
-            responseEntityForUserRolesRequest = restTemplateBuilder.build()
-                    .exchange(serviceUrlForStatus, HttpMethod.POST, entity,
-                            String.class);
-            responseEntityForUserRolesRequest.getStatusCode();
-            Utils.writeIdToFile(DELETE_ROLES_INDEX_FILE,
-                    responseEntityForUserRolesRequest
-                    .getBody());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail();
-            return;
-            // not throwing the exception as its a negative testcase
-        }
-        Assert.assertNotNull(responseEntityForUserRolesRequest);
-    }
-
-    @Then("^I get the new role id in response$")
-    public void iGetTheNewRoleIdInResponse(String arg0) throws Throwable {
-        Assert.assertNotNull(responseEntityForUserRolesRequest);
-        Assert.assertTrue(responseEntityForUserRolesRequest.getStatusCode()
-                .toString().equals(HttpStatus.CREATED.toString()));
-    }
-
-    @When("^user requests for deleting a roles \"([^\"]*)\"$")
-    public void userRequestsForDeletingARoles(String arg0) throws Throwable {
-        HttpHeaders headers = Utils
-                .buildBasicHttpHeadersForBearerAuthentication(
-                        authenticationJwtToken.getAccess_token());
-        String toBeDeletedRecord = Utils.readFile(DELETE_ROLES_INDEX_FILE);
-
-        String deleteRecord = toBeDeletedRecord.substring(
-                toBeDeletedRecord.indexOf(BEGIN_INDEX_OF_COLON) + 1,
-                toBeDeletedRecord.indexOf(END_INDEX_DELETE_ID));
-        arg0 = arg0.substring(0, arg0.lastIndexOf('/') + 1) +  deleteRecord;
-        HttpEntity<Object> entity = new HttpEntity<Object>(headers);
-
-        try {
-            responseEntityForUserRolesRequest = restTemplateBuilder.build()
-                    .exchange(arg0, HttpMethod.DELETE, entity,
-                            String.class);
-            responseEntityForUserRolesRequest.getStatusCode();
-            Utils.writeIdToFile(DELETE_ROLES_INDEX_FILE, "");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail();
-            return;
-            // not throwing the exception as its a negative testcase
-        }
-        Assert.assertNotNull(responseEntityForUserRolesRequest);
-    }
-
-    @Then("^I get a role cannot be deleted response$")
-    public void iGetARoleIsDeletedResponse() throws Throwable {
-        Assert.assertNotNull(responseEntityForUserRolesRequest);
-        Assert.assertTrue(responseEntityForUserRolesRequest.getStatusCode()
-                .toString().equals(HttpStatus.NO_CONTENT.toString()));
-    }
-
-    @Then("^I should get a failed message for roles \"([^\"]*)\"$")
-    public void iShouldGetAFailedMessageForRoles(String arg0) throws Throwable {
-        Assert.assertTrue(HTTP_401_UNAUTHORIZED_MESSAGE.equals(
-                HttpStatus.UNAUTHORIZED.toString()));
-    }
-
-    @When("^I request the login through JWT token for permission$")
-    public void iRequestTheLoginThroughJWTTokenForPermission() throws
-                                                               Throwable {
-        Assert.assertTrue(HTTP_401_UNAUTHORIZED_MESSAGE.equals(
-                HttpStatus.UNAUTHORIZED.toString()));
-    }
 }

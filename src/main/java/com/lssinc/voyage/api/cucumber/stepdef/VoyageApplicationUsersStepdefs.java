@@ -18,13 +18,11 @@
  */
 package com.lssinc.voyage.api.cucumber.stepdef;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lssinc.voyage.api.cucumber.VoyageApiTestingCucumberApplication;
 import com.lssinc.voyage.api.cucumber.domain.AuthenticationJwtToken;
 import com.lssinc.voyage.api.cucumber.util.Utils;
 import com.lssinc.voyage.api.cucumber.util.VoyageConstants;
 import com.sun.glass.ui.Application;
-
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -52,12 +50,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 
 /**
@@ -71,52 +65,24 @@ import java.util.Random;
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest
         .WebEnvironment.RANDOM_PORT)
 public class VoyageApplicationUsersStepdefs {
-
     /**
-     * .
-     * OK message for verifying against the successful response
+     * file to store the to be deleted index
      */
-    public static final String MESSAGE_OK_200 = "<200 OK";
-    /**
-     * .
-     * token begin index
-     */
-    public static final int TOKEN_BEGIN_INDEX = 25;
-    /**
-     * .
-     * token end index
-     */
-    public static final int TOKEN_END_INDEX = 1025;
-    /**
-     * .
-     * voyage api status
-     */
-    public static final String VOYAGE_API_STATUS = "status";
-    /**
-     *  http 200 ok
-     */
-    private static final String HTTP_200_OK = null;
-    public static final int MAX_RANDOM_NUMBER = 1000;
     public static final String DELETE_USER_FILE_INDEX = "deleteUserFileIndex"
             + ".txt";
-    public static final int BEGIN_INDEX_DELETE_ID = 7;
+    /**
+     * end index to find the inserted/ to be deleted record id
+     */
     public static final char END_INDEX_DELETE_ID = ',';
+    /**
+     * starting index to find the inserted/ to be deleted record id
+     */
+    private static final char BEGIN_INDEX_OF_COLON = ':';
     /**
      * .
      * saves the token response
      */
     private static ResponseEntity responseSaved = null;
-    /**
-     * .
-     * OAUTH2_SUCCESS_MESSAGE is used to verifying steps to successful
-     * oAuthToken generation
-     */
-    private static String OAUTH2_SUCCESS_MESSAGE;
-    /**
-     * .
-     *  used to verifying step for using invalid bearer token
-     */
-    private static String HTTP_401_UNAUTHORIZED_MESSAGE;
     /**
      * .
      * stores the response entity for user request test case, it will be used
@@ -200,7 +166,7 @@ public class VoyageApplicationUsersStepdefs {
     /**.
      *
      */
-    @Value("${voyagestepdef.granttypevalue}")
+    @Value("${voyagestepdefinvalidauthtoken.accesstoken}")
     private String accessToken;
 
     /**.
@@ -220,6 +186,8 @@ public class VoyageApplicationUsersStepdefs {
     private static String HTTP_204_NO_CONTENT;
     private static String MESSAGE_404_UNAUTHORIZED;
     private static String usernameForInserting;
+    private static ResponseEntity<String>
+            responseEntityMissingRequiredParamUser;
 
     /**.
      * @return RestTemplate
@@ -265,17 +233,10 @@ public class VoyageApplicationUsersStepdefs {
                     new BasicAuthorizationInterceptor(user, password));
             restTemplate.getMessageConverters().add(new
                     StringHttpMessageConverter());
-                    response =
-                            restTemplate.exchange(oAuthTokenUrl, HttpMethod
-                                    .POST, httpEntity, String.class);
-
-            ObjectMapper mapper = new ObjectMapper();
-            String responseBody = response.getBody();
-            InputStream stream = new ByteArrayInputStream(responseBody
-                    .getBytes(StandardCharsets.UTF_8.name()));
-            authenticationJwtToken = mapper.readValue
-                    (stream, AuthenticationJwtToken.class);
-
+            response =
+                    restTemplate.exchange(oAuthTokenUrl, HttpMethod
+                            .POST, httpEntity, String.class);
+            authenticationJwtToken = Utils.getAuthenticationJwtToken(response);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -298,7 +259,6 @@ public class VoyageApplicationUsersStepdefs {
                             String.class);
         } catch (Exception e) {
             e.printStackTrace();
-            HTTP_401_UNAUTHORIZED_MESSAGE = e.getMessage();
             Assert.fail();
             // not throwing the exception as its a negative testcase
         }
@@ -327,7 +287,7 @@ public class VoyageApplicationUsersStepdefs {
             e.printStackTrace();
             Assert.assertTrue(e.getMessage().trim().equals(HttpStatus
                     .UNAUTHORIZED.toString()));
-            HTTP_401_UNAUTHORIZED = e.getMessage();
+            HTTP_401_UNAUTHORIZED = e.getMessage().trim();
             // not throwing the exception as its a negative testcase
             return;
         }
@@ -337,10 +297,8 @@ public class VoyageApplicationUsersStepdefs {
 
     @And("^with users url \"([^\"]*)\"  for listing users$")
     public void withUsersUrlForListingUsers(String arg0) throws Throwable {
-        String token = context.getEnvironment().getProperty(""
-                + "voyagestepdefinvalidauthtoken.accesstoken");
         HttpHeaders headers = Utils
-                .buildBasicHttpHeadersForBearerAuthentication(token);
+                .buildBasicHttpHeadersForBearerAuthentication(accessToken);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
 
         try {
@@ -351,7 +309,7 @@ public class VoyageApplicationUsersStepdefs {
             e.printStackTrace();
             Assert.assertTrue(e.getMessage().trim().equals(HttpStatus
                     .UNAUTHORIZED.toString()));
-            HTTP_401_UNAUTHORIZED = e.getMessage();
+            HTTP_401_UNAUTHORIZED = e.getMessage().trim();
             // not throwing the exception as its a negative testcase
             return;
         }
@@ -368,7 +326,7 @@ public class VoyageApplicationUsersStepdefs {
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication
                         (authenticationJwtToken.getAccess_token());
-        int randomNumber = getRandomNumber();
+        int randomNumber = Utils.getRandomNumber();
         usernameForInserting = "FirstName" + randomNumber + "@app.com";
         String body =  updateRequestBodyFor();
         HttpEntity<?> httpEntity = new HttpEntity<Object>(body, headers);
@@ -382,22 +340,12 @@ public class VoyageApplicationUsersStepdefs {
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
-            HTTP_401_UNAUTHORIZED_MESSAGE = e.getMessage();
             // not throwing the exception as its a negative testcase
             return;
         }
         Assert.assertNotNull(responseEntityUserList);
-    }
-
-
-    /**
-     *
-     * @return returns randon number between 1 to 1000
-     */
-    private int getRandomNumber() {
-        int min = 1;
-        Random random = new Random();
-        return min + random.nextInt(MAX_RANDOM_NUMBER);
+        Assert.assertTrue(responseEntityUserList.getStatusCode().toString()
+                .equals(HttpStatus.CREATED.toString()));
     }
 
     /**.
@@ -489,6 +437,8 @@ public class VoyageApplicationUsersStepdefs {
     public void iShouldObtainTheFollowingForCreatingUser(String arg0)
             throws Throwable {
         Assert.assertTrue(responseEntityUserList.getBody() != null);
+        Assert.assertTrue(responseEntityUserList.getStatusCode().toString()
+                .equals(HttpStatus.CREATED.toString()));
     }
 
 
@@ -497,21 +447,22 @@ public class VoyageApplicationUsersStepdefs {
     public void
     userRequestsForCreatingUserWithMissingRequiredParameter(String arg0)
             throws Throwable {
-        String token = responseSaved.toString().substring(TOKEN_BEGIN_INDEX,
-                TOKEN_END_INDEX);
         HttpHeaders headers = Utils
-                .buildBasicHttpHeadersForBearerAuthentication(token);
+                .buildBasicHttpHeadersForBearerAuthentication
+                        (authenticationJwtToken.getAccess_token());
         String body =  updateRequestBodyForWithMissingRequiredParameters();
         HttpEntity<?> httpEntity = new HttpEntity<Object>(body, headers);
 
         try {
-            responseEntityUserList = restTemplateBuilder.build()
-                    .exchange(arg0, HttpMethod.POST, httpEntity,
+            responseEntityMissingRequiredParamUser = restTemplateBuilder
+                    .build().exchange(arg0, HttpMethod.POST, httpEntity,
                             String.class);
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.assertTrue(e.getMessage().contains("400"));
-            HTTP_400_MISSING_REQUIRED_PARAMETER = e.getMessage().trim();
+            responseEntityMissingRequiredParamUser = new
+                    ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+            Assert.assertTrue(e.getMessage().toString().trim()
+                    .equals(HttpStatus.BAD_REQUEST.toString()));
             // not throwing the exception as its a negative testcase
             return;
         }
@@ -522,34 +473,35 @@ public class VoyageApplicationUsersStepdefs {
     public void
     iShouldObtainTheFollowingForCreatingUserWithMissingRequiredParameter
             (String arg0) throws Throwable {
-        Assert.assertTrue(HTTP_400_MISSING_REQUIRED_PARAMETER.equals("400"));
+        Assert.assertTrue(responseEntityMissingRequiredParamUser
+                .getStatusCode().toString()
+                .equals(HttpStatus.BAD_REQUEST.toString()));
     }
 
     @When("^user requests for \"([^\"]*)\" deleting user$")
     public void userRequestsForDeletingUser(String arg0) throws Throwable {
-        String token = responseSaved.toString().substring(TOKEN_BEGIN_INDEX,
-                TOKEN_END_INDEX);
-        authenticationJwtToken.getAccess_token();
         HttpHeaders headers = Utils
-                .buildBasicHttpHeadersForBearerAuthentication(token);
+                .buildBasicHttpHeadersForBearerAuthentication(
+                        authenticationJwtToken.getAccess_token());
         String toBeDeletedRecord = Utils.readFile(DELETE_USER_FILE_INDEX);
 
-        String deleteRecord = toBeDeletedRecord.substring(BEGIN_INDEX_DELETE_ID,
+        String deleteRecord = toBeDeletedRecord.substring(
+                toBeDeletedRecord.indexOf(BEGIN_INDEX_OF_COLON) + 1,
                 toBeDeletedRecord.indexOf(END_INDEX_DELETE_ID));
-        HttpEntity<?> httpEntity = new HttpEntity<Object>(headers);
+        HttpEntity<Object> httpEntity = new HttpEntity<Object>(headers);
 
-        arg0 = arg0.substring(0, arg0.lastIndexOf('/') + 1) +  deleteRecord;
+        String url = arg0.substring(0, arg0.lastIndexOf('/') + 1)
+                + deleteRecord;
         try {
             responseEntityUserList = restTemplateBuilder.build()
-                    .exchange(arg0, HttpMethod.DELETE, httpEntity,
+                    .exchange(url, HttpMethod.DELETE, httpEntity,
                             String.class, deleteRecord);
-            //Utils.writeIdToFile(DELETE_USER_FILE_INDEX,"");
+            Utils.writeIdToFile(DELETE_USER_FILE_INDEX, "");
             HttpStatus status = responseEntityUserList.getStatusCode();
             Assert.assertTrue(status == HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
-            HTTP_204_NO_CONTENT = e.getMessage().trim();
             // not throwing the exception as its a negative testcase
             return;
         }
@@ -558,18 +510,17 @@ public class VoyageApplicationUsersStepdefs {
 
 
     @Then("^I should obtain the deleted record id in response$")
-    public void iShouldObtainTheDeletedRecordIdInResponse(String arg0) throws
-                                                               Throwable {
+    public void iShouldObtainTheDeletedRecordIdInResponse(String arg0)
+            throws Throwable {
         Assert.assertTrue(responseEntityUserList.getStatusCode()
                 .toString().equals(HttpStatus.NO_CONTENT.toString()));
     }
 
     @When("^user requests for \"([^\"]*)\" user details by id$")
     public void userRequestsForUserDetailsById(String arg0) throws Throwable {
-        String token = responseSaved.toString().substring(TOKEN_BEGIN_INDEX,
-                TOKEN_END_INDEX);
         HttpHeaders headers = Utils
-                .buildBasicHttpHeadersForBearerAuthentication(token);
+                .buildBasicHttpHeadersForBearerAuthentication
+                        (authenticationJwtToken.getAccess_token());
         HttpEntity<?> httpEntity = new HttpEntity<Object>(headers);
 
         try {
@@ -593,19 +544,18 @@ public class VoyageApplicationUsersStepdefs {
     }
 
     @Then("^I should obtain user details in response$")
-    public void iShouldObtainUserDetailsInResponse(String arg0) throws
-                                                               Throwable {
+    public void iShouldObtainUserDetailsInResponse(String arg0)
+            throws Throwable {
         Assert.assertTrue(HttpStatus.OK.toString().equals(
                 responseEntityUserList.getStatusCode().toString().trim()));
     }
 
     @When("^user requests for updating \"([^\"]*)\" user details by id$")
-    public void userRequestsForUpdatingUserDetailsById(String arg0) throws
-                                                                    Throwable {
-        String token = responseSaved.toString().substring(TOKEN_BEGIN_INDEX,
-                TOKEN_END_INDEX);
+    public void userRequestsForUpdatingUserDetailsById(String arg0)
+            throws Throwable {
         HttpHeaders headers = Utils
-                .buildBasicHttpHeadersForBearerAuthentication(token);
+                .buildBasicHttpHeadersForBearerAuthentication
+                        (authenticationJwtToken.getAccess_token());
         String body =  updateRequestBodyForUpdating();
         HttpEntity<?> httpEntity = new HttpEntity<Object>(body, headers);
 
@@ -629,4 +579,32 @@ public class VoyageApplicationUsersStepdefs {
                 == HttpStatus.OK);
     }
 
+    @When("^I request the login through JWT token for users$")
+    public void iRequestTheLoginThroughJWTTokenForUsers() throws Throwable {
+        HttpHeaders headers = Utils
+                .buildBasicHttpHeadersForBearerAuthentication
+                        (accessToken);
+        HttpEntity<?> httpEntity = new HttpEntity<Object>(headers);
+
+        try {
+            responseEntityUserList = restTemplateBuilder.build()
+                    .exchange(oAuthTokenUrl, HttpMethod.GET, httpEntity,
+                            String.class);
+            Assert.assertTrue(HttpStatus.UNAUTHORIZED.toString().equals(
+                    responseEntityUserList.getStatusCode().toString().trim()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.assertTrue(e.getMessage().trim().equals(HttpStatus
+                    .UNAUTHORIZED.toString()));
+            HTTP_401_UNAUTHORIZED = e.getMessage().trim();
+            return;
+        }
+        Assert.fail();
+    }
+
+    @Then("^I should get a failure message \"([^\"]*)\"$")
+    public void iShouldGetAFaileureMessage(String arg0) throws Throwable {
+        Assert.assertTrue(HTTP_401_UNAUTHORIZED
+                .equals(HttpStatus.UNAUTHORIZED.toString()));
+    }
 }

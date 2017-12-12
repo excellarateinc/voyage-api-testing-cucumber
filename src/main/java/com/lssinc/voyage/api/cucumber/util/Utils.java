@@ -18,6 +18,9 @@
  */
 package com.lssinc.voyage.api.cucumber.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lssinc.voyage.api.cucumber.domain.AuthenticationJwtToken;
+import org.apache.commons.io.FileUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -25,17 +28,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**.
  *
@@ -43,6 +47,10 @@ import java.util.Map;
  */
 public class Utils {
 
+    /**
+     * max random number to insert the user name
+     */
+    public static final int MAX_RANDOM_NUMBER = 1000;
 
     /**.
      * builds the request parameter
@@ -137,34 +145,67 @@ public class Utils {
      */
     public static void writeIdToFile(String filePath, String body)
             throws IOException {
+        Writer writer = null;
+        File file = null;
         try {
-            java.io.Writer wr = new FileWriter(filePath);
-            wr.write(body);
-            wr.close();
+            file = new File(filePath);
+            writer = new OutputStreamWriter(
+                    new FileOutputStream(file), StandardCharsets.UTF_8);
+            writer.write(body);
+
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            writer.close();
         }
     }
 
     /**
      * reads the object from a given file object
-     * @param filename
+     * @param fileName
      * @return
      */
-    public static String readFile(String filename) {
-        List<String> lines = null;
-        String line = null;
+    public static String readFile(String fileName) {
+        File file = null;
+        String readfile = null;
         try {
-            FileReader fileReader = new FileReader(filename);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            lines = new ArrayList<String>();
-            while ((line = bufferedReader.readLine()) != null) {
-                lines.add(line);
-            }
-            bufferedReader.close();
-        } catch (IOException e) {
+             file = new File(fileName);
+            readfile = FileUtils.readFileToString(new File(fileName),
+                    StandardCharsets.UTF_8);
+        } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            file = null;
         }
-        return Arrays.toString(lines.toArray(new String[lines.size()]));
+        return readfile;
+    }
+
+
+    /**
+     *
+     * @return returns random number between 1 to 1000
+     */
+    public static int getRandomNumber() {
+        int min = 1;
+        Random random = new Random();
+        return min + random.nextInt(MAX_RANDOM_NUMBER);
+    }
+
+    /**
+     *  returns the AuthenticationJwtToken class
+     * @param response
+     * @return
+     * @throws java.io.IOException
+     */
+    public static AuthenticationJwtToken getAuthenticationJwtToken
+            (ResponseEntity<String> response)
+            throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        String responseBody = response.getBody();
+        InputStream stream = new ByteArrayInputStream(responseBody
+                .getBytes(StandardCharsets.UTF_8.name()));
+        AuthenticationJwtToken authenticationJwtToken =
+                mapper.readValue (stream, AuthenticationJwtToken.class);
+        return authenticationJwtToken;
     }
 }
