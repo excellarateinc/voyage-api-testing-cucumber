@@ -41,14 +41,14 @@ Now we can get the project dependencies installed:
 
 Run the gradle build
 
-    ./gradlew build
+    gradlew build
 
 Observer the dependent jars downloaded
 
 
 Run the gradle build
 
-    ./gradlew bootRun
+    gradlew bootRun
 
 Observer the server startup
 

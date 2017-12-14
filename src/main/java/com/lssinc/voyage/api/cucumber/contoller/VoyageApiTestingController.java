@@ -95,8 +95,8 @@ public class VoyageApiTestingController {
             //set response entity
             HttpEntity<Object> entity = new HttpEntity<Object>(headers);
             ResponseEntity<String> responseEntity =
-                    restTemplateBuilder.build().exchange(reportsUrl, HttpMethod.GET,
-                            entity, String.class);
+             restTemplateBuilder.build().exchange(reportsUrl, HttpMethod.GET,
+                     entity, String.class);
             return responseEntity;
         } catch (Exception e) {
             e.printStackTrace();

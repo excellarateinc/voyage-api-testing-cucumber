@@ -37,7 +37,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -530,8 +529,9 @@ public class VoyageApplicationUsersStepdefs {
 
     @When("^user requests for \"([^\"]*)\" user details by id$")
     public void userRequestsForUserDetailsById(String arg0) throws Throwable {
-        String serviceUrlForUsers = serverUrl + VoyageConstants.FORWARD_SLASH +
-                serverApiVersion + VoyageConstants.VOYAGE_API_USERS_PATH
+        String serviceUrlForUsers = serverUrl + VoyageConstants.FORWARD_SLASH
+                + serverApiVersion
+                + VoyageConstants.VOYAGE_API_USERS_PATH
                 + VoyageConstants.FORWARD_SLASH
                 + VoyageConstants.VOYAGE_API_RETRIEVE_RECORD;
         HttpHeaders headers = Utils
@@ -562,12 +562,13 @@ public class VoyageApplicationUsersStepdefs {
     @When("^user requests for updating \"([^\"]*)\" user details by id$")
     public void userRequestsForUpdatingUserDetailsById(String arg0)
             throws Throwable {
-        String serviceUrlForUsers = serverUrl + VoyageConstants.FORWARD_SLASH +
-                serverApiVersion + VoyageConstants.VOYAGE_API_USERS_PATH
+        String serviceUrlForUsers = serverUrl + VoyageConstants.FORWARD_SLASH
+                + serverApiVersion
+                + VoyageConstants.VOYAGE_API_USERS_PATH
                 + VoyageConstants.FORWARD_SLASH
                 + VoyageConstants.VOYAGE_API_RETRIEVE_RECORD;
-        HttpHeaders headers = Utils
-                .buildBasicHttpHeadersForBearerAuthentication
+        HttpHeaders headers =
+                Utils.buildBasicHttpHeadersForBearerAuthentication
                         (authenticationJwtToken.getAccess_token());
         String body =  updateRequestBodyForUpdating();
         HttpEntity<?> httpEntity = new HttpEntity<Object>(body, headers);

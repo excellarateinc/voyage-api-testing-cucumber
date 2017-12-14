@@ -403,8 +403,8 @@ public class VoyageApplicationPermissionsStepdefs {
         try {
             responseEntityForUserPermissionsRequest =
                     restTemplateBuilder.build()
-                    .exchange(serviceUrlForPermissions, HttpMethod.DELETE, entity,
-                            String.class);
+                    .exchange(serviceUrlForPermissions, HttpMethod.DELETE,
+                            entity, String.class);
         } catch (RestClientException e) {
             e.printStackTrace();
             Assert.assertTrue(responseEntityForUserPermissionsRequest
@@ -446,8 +446,8 @@ public class VoyageApplicationPermissionsStepdefs {
     public void iRequestTheLoginThroughJWTTokenForPermissions() throws
                                                                 Throwable {
         String serviceUrlForPermissions = serverUrl + VoyageConstants
-                .FORWARD_SLASH + serverApiVersion +
-                VoyageConstants.VOYAGE_API_PERMISSIONS_PATH;
+                .FORWARD_SLASH + serverApiVersion
+                + VoyageConstants.VOYAGE_API_PERMISSIONS_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         accessToken);

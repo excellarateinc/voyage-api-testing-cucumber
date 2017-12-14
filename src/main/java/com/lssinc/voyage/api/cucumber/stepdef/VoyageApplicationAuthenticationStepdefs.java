@@ -166,7 +166,7 @@ public class VoyageApplicationAuthenticationStepdefs {
      * @throws Exception
      */
     @PostConstruct
-    public void init() throws Exception{
+    public void init() throws Exception {
         oAuthTokenUrl = serverUrl + serverOauthPath;
     }
 
