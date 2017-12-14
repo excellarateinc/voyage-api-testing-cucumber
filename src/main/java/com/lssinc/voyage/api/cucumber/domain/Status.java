@@ -16,56 +16,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.lssinc.voyage.api.cucumber.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.joda.time.DateTime;
 
-import javax.validation.constraints.NotNull;
-import java.util.Set;
+/**
+ * response status class placeholder
+ */
+public class Status {
 
-public class Role {
+    String status;
 
-    int id;
+    String datetime;
 
-    @NotNull
-    String name;
-
-    @NotNull
-    String authority;
-
-    @JsonIgnore
-    Set<Permission> permissions;
-
-    public int getId() {
-        return id;
+    public String getStatus() {
+        return status;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
-    public String getName() {
-        return name;
+    public String getDatetime() {
+        return datetime;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setDatetime(String datetime) {
+        this.datetime = datetime;
     }
 
-    public String getAuthority() {
-        return authority;
-    }
-
-    public void setAuthority(String authority) {
-        this.authority = authority;
-    }
-
-    public Set<Permission> getPermissions() {
-        return permissions;
-    }
-
-    public void setPermissions(Set<Permission> permissions) {
-        this.permissions = permissions;
-    }
 }

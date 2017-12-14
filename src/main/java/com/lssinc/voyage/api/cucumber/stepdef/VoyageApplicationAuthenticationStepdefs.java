@@ -35,7 +35,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -47,6 +46,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -88,10 +88,9 @@ public class VoyageApplicationAuthenticationStepdefs {
     @Value("${voyagestepdef.clientsecretvalue}")
     private String password;
     /**
-     * .
+     * Oauth2 token request url
      */
-    @Value("${voyagestepdef.oauthtokenurl}")
-    private String oAuthTokenUrl;
+    private static String oAuthTokenUrl;
     /**
      * .
      */
@@ -143,6 +142,21 @@ public class VoyageApplicationAuthenticationStepdefs {
     @Value("${voyagestepdefinvalidauthtoken.responsemessage}")
     private String invalidAuthTokenResponseMessage;
     /**.
+     * voyage api server url
+     */
+    @Value("${voyageapi.serverurl}")
+    private String serverUrl;
+    /**.
+     * voyage api server api version
+     */
+    @Value("${voyageapi.serverapiversion}")
+    private String serverApiVersion;
+    /**.
+     * voyage api oauth token path
+     */
+    @Value("${voyageapi.oauthpath}")
+    private String serverOauthPath;
+    /**.
      * rest template used to call rest services from Voyage API
      * @return RestTemplate
      */
@@ -150,21 +164,20 @@ public class VoyageApplicationAuthenticationStepdefs {
     private RestTemplateBuilder restTemplateBuilder;
 
     /**
-     * .
-     *
-     * @return RestTemplate
+     * initializing variables and constructing the oauth2 url for auth token
+     * generation
+     * @throws Exception
      */
-
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+    @PostConstruct
+    public void init() throws Exception{
+        oAuthTokenUrl = serverUrl + serverOauthPath;
     }
 
     @Given("^a Oauth(\\d+) url \"([^\"]*)\"$")
     public void a_Oauth_url(int arg1, String arg2) throws Throwable {
         URI url = null;
         try {
-            url = new URI(arg2);
+            url = new URI(oAuthTokenUrl);
         } catch (Exception e) {
             Assert.fail();
             throw e;
@@ -270,7 +283,7 @@ public class VoyageApplicationAuthenticationStepdefs {
         Assert.assertEquals(invalidAuthTokenServiceurlForStatus, arg1);
     }
 
-    @When("^I request the login through JWT token$")
+    /*@When("^I request the login through JWT token$")
     public void i_request_the_login_through_JWT_token() throws Throwable {
         HttpHeaders headers =
                 Utils.buildBasicHttpHeadersForBearerAuthentication(
@@ -294,7 +307,7 @@ public class VoyageApplicationAuthenticationStepdefs {
             return;
         }
         Assert.fail();
-    }
+    }*/
 
     @Then("^I should get a failed login message for authentication \"([^\"]*)"
             + "\"$")

@@ -27,8 +27,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 /**.
- * Cucumber Runner will run the cucumber integration tests, it adds as a
- * hooks to control the test case execution
+ * Cucumber Runner will run the cucumber integration tests, it acts as a
+ * hook to control the test case execution
  */
 @Component
 @RunWith(Cucumber.class)

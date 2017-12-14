@@ -21,8 +21,6 @@ logging:
 spring:
   application:
     name: Voyage API Testing Cucumber Application
-  main:
-    banner-mode: "off"
 
 #######################################################################################################################
 # Spring Boot Web / Embedded Tomcat
@@ -41,6 +39,11 @@ security:
 # Voyage API Testing properties file
 #######################################################################################################################
 ---
+voyageapi:
+  serverurl: http://localhost:8080
+  serverapiversion: /api/v1
+  oauthpath: /oauth/token
+
 voyagestepdef:
   authtypebasic: "Basic"
   applicationcontenttype: application/x-www-form-urlencoded

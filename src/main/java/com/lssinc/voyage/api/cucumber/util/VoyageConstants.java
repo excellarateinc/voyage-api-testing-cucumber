@@ -72,4 +72,30 @@ public class VoyageConstants {
      *  Bearer token constant
      */
     public static final String BEARER_TOKEN = "Bearer ";
+
+    /**.
+     *  voyage api version
+     */
+    public static final String VOYAGE_API_VERSION = "api/v1/";
+    /**.
+     *  forward slash
+     */
+    public static final String FORWARD_SLASH = "/";
+    /**
+     * voyage constants permissions api path
+     */
+    public static final String VOYAGE_API_PERMISSIONS_PATH = "permissions";
+    /**
+     *  voyage api retrieve record
+     */
+    public static final String VOYAGE_API_RETRIEVE_RECORD = "1";
+    /**
+     * voyage constants roles api path
+     */
+    public static final String VOYAGE_API_ROLES_PATH = "roles";
+    /**
+     * voyage constants roles api path
+     */
+    public static final String VOYAGE_API_USERS_PATH = "users";
+
 }

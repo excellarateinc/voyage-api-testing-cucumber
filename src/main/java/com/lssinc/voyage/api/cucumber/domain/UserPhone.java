@@ -19,18 +19,101 @@
 
 package com.lssinc.voyage.api.cucumber.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.validator.constraints.NotBlank;
+
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 /**
  * user phone class
  */
 public class UserPhone {
 
-    @NotNull
-    String name;
+    int id;
 
-    String description;
+    String phoneType;
+
+    @NotBlank
+    String phoneNumber;
+
+    @JsonIgnore
+    String verifyCode;
 
     @NotNull
-    Boolean isImmutable = Boolean.FALSE;
+    @JsonIgnore
+    Boolean isValidated = Boolean.FALSE;
+
+    @JsonIgnore
+    Date verifyCodeExpiresOn;
+
+    @JsonIgnore
+    User user;
+
+    @JsonIgnore
+    String isVerifyCodeExpired;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getPhoneType() {
+        return phoneType;
+    }
+
+    public void setPhoneType(String phoneType) {
+        this.phoneType = phoneType;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getVerifyCode() {
+        return verifyCode;
+    }
+
+    public void setVerifyCode(String verifyCode) {
+        this.verifyCode = verifyCode;
+    }
+
+    public Boolean getValidated() {
+        return isValidated;
+    }
+
+    public void setValidated(Boolean validated) {
+        isValidated = validated;
+    }
+
+    public Date getVerifyCodeExpiresOn() {
+        return verifyCodeExpiresOn;
+    }
+
+    public void setVerifyCodeExpiresOn(Date verifyCodeExpiresOn) {
+        this.verifyCodeExpiresOn = verifyCodeExpiresOn;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getIsVerifyCodeExpired() {
+        return isVerifyCodeExpired;
+    }
+
+    public void setIsVerifyCodeExpired(String isVerifyCodeExpired) {
+        this.isVerifyCodeExpired = isVerifyCodeExpired;
+    }
 }

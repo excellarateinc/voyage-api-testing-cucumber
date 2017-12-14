@@ -20,6 +20,10 @@ package com.lssinc.voyage.api.cucumber.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lssinc.voyage.api.cucumber.domain.AuthenticationJwtToken;
+import com.lssinc.voyage.api.cucumber.domain.Permission;
+import com.lssinc.voyage.api.cucumber.domain.Role;
+import com.lssinc.voyage.api.cucumber.domain.Status;
+import com.lssinc.voyage.api.cucumber.domain.User;
 import org.apache.commons.io.FileUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -37,7 +41,9 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -46,14 +52,15 @@ import java.util.Random;
  * utility class contains common functionality and reusable code
  */
 public class Utils {
-
     /**
      * max random number to insert the user name
      */
     public static final int MAX_RANDOM_NUMBER = 1000;
 
-    /**.
+    /**
+     * .
      * builds the request parameter
+     *
      * @param propertiesMap contains the properties fro request header
      * @return returns @link{ {@link ResponseEntity}}
      */
@@ -79,7 +86,7 @@ public class Utils {
      * @return the {@link HttpHeaders } for authentication token
      */
     public static HttpHeaders
-        buildBasicAuthenticationHttpHeader(String user, String password)
+    buildBasicAuthenticationHttpHeader(String user, String password)
             throws UnsupportedEncodingException {
 
         String notEncoded = user + ":" + password;
@@ -91,9 +98,9 @@ public class Utils {
     }
 
     /**
-     *
-     * @param headers http header, it will be returned after composing headers
-     *        {@link HttpHeaders}
+     * @param headers       http header, it will be returned after composing
+     *                      headers
+     *                      {@link HttpHeaders}
      * @param propertiesMap contains the properties from request body
      * @return composed http header {@link HttpHeaders}
      */
@@ -123,7 +130,6 @@ public class Utils {
     }
 
     /**
-     *
      * @param accessToken
      * @return returns the http headers required for authentication
      * {@link HttpHeaders}
@@ -139,7 +145,6 @@ public class Utils {
 
     /**
      * writes the id of the given object at the given file name
-     *
      * @param filePath file path of the file to be written
      * @throws IOException
      */
@@ -169,7 +174,7 @@ public class Utils {
         File file = null;
         String readfile = null;
         try {
-             file = new File(fileName);
+            file = new File(fileName);
             readfile = FileUtils.readFileToString(new File(fileName),
                     StandardCharsets.UTF_8);
         } catch (Exception e) {
@@ -182,7 +187,6 @@ public class Utils {
 
 
     /**
-     *
      * @return returns random number between 1 to 1000
      */
     public static int getRandomNumber() {
@@ -192,20 +196,138 @@ public class Utils {
     }
 
     /**
-     *  returns the AuthenticationJwtToken class
+     * returns the AuthenticationJwtToken class
      * @param response
-     * @return
+     * @return AuthenticationJwtToken
      * @throws java.io.IOException
      */
     public static AuthenticationJwtToken getAuthenticationJwtToken
-            (ResponseEntity<String> response)
+    (ResponseEntity<String> response)
             throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         String responseBody = response.getBody();
         InputStream stream = new ByteArrayInputStream(responseBody
                 .getBytes(StandardCharsets.UTF_8.name()));
         AuthenticationJwtToken authenticationJwtToken =
-                mapper.readValue (stream, AuthenticationJwtToken.class);
+                mapper.readValue(stream, AuthenticationJwtToken.class);
         return authenticationJwtToken;
+    }
+
+    /**
+     * returns the Status class
+     * @param response
+     * @return Status
+     * @throws java.io.IOException
+     */
+    public static Status getStatus(ResponseEntity<String> response)
+            throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        String responseBody = response.getBody();
+        InputStream stream = new ByteArrayInputStream(responseBody
+                .getBytes(StandardCharsets.UTF_8.name()));
+        Status status =
+                mapper.readValue(stream, Status.class);
+        return status;
+    }
+
+
+    /**
+     * returns the {@link Status} class
+     * @param response
+     * @return Status
+     * @throws java.io.IOException
+     */
+    public static Role getUserRole(ResponseEntity<String> response)
+            throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        String responseBody = response.getBody();
+        InputStream stream = new ByteArrayInputStream(responseBody
+                .getBytes(StandardCharsets.UTF_8.name()));
+        Role role =
+                mapper.readValue(stream, Role.class);
+        return role;
+    }
+
+    /**
+     * returns the list of {@link Permission}
+     * @param response
+     * @return Status
+     * @throws java.io.IOException
+     */
+    public static List<Permission> getUserPermissions(ResponseEntity<String>
+                                          response) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        String responseBody = response.getBody();
+        InputStream stream = new ByteArrayInputStream(responseBody
+                .getBytes(StandardCharsets.UTF_8.name()));
+        List<Permission> permission =
+                Arrays.asList(mapper.readValue(stream, Permission[].class));
+        return permission;
+    }
+
+    /**
+     * returns the {@link Permission} class
+     * @param response
+     * @return Permission
+     * @throws java.io.IOException
+     */
+    public static Permission getUserPermission(ResponseEntity<String> response)
+            throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        String responseBody = response.getBody();
+        InputStream stream = new ByteArrayInputStream(responseBody
+                .getBytes(StandardCharsets.UTF_8.name()));
+        Permission permission =
+                mapper.readValue(stream, Permission.class);
+        return permission;
+    }
+
+    /**
+     * returns the list of {@Link Role) class
+     * @param response
+     * @return role
+     * @throws java.io.IOException
+     */
+    public static List<Role> getUserRoles(ResponseEntity<String> response)
+            throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    String responseBody = response.getBody();
+    InputStream stream = new ByteArrayInputStream(responseBody
+            .getBytes(StandardCharsets.UTF_8.name()));
+       List<Role> roles = Arrays.asList(mapper.readValue(stream, Role[].class));
+    return roles;
+    }
+
+    /**
+     * returns the list of {@Link User) class
+     * @param response
+     * @return user
+     * @throws java.io.IOException
+     */
+    public static List<User> getUsers(ResponseEntity<String> response)
+            throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        String responseBody = response.getBody();
+        InputStream stream = new ByteArrayInputStream(responseBody
+                .getBytes(StandardCharsets.UTF_8.name()));
+        List<User> users = Arrays.asList(mapper.readValue(stream, User[]
+                .class));
+        return users;
+    }
+
+    /**
+     * returns the{@Link User) class
+     * @param response
+     * @return user
+     * @throws java.io.IOException
+     */
+    public static User getUser(ResponseEntity<String> response)
+            throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        String responseBody = response.getBody();
+        InputStream stream = new ByteArrayInputStream(responseBody
+                .getBytes(StandardCharsets.UTF_8.name()));
+        User users = mapper.readValue(stream, User.class);
+        return users;
     }
 }

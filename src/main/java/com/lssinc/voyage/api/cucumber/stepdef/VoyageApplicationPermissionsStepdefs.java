@@ -20,6 +20,7 @@ package com.lssinc.voyage.api.cucumber.stepdef;
 
 import com.lssinc.voyage.api.cucumber.VoyageApiTestingCucumberApplication;
 import com.lssinc.voyage.api.cucumber.domain.AuthenticationJwtToken;
+import com.lssinc.voyage.api.cucumber.domain.Permission;
 import com.lssinc.voyage.api.cucumber.util.Utils;
 import com.lssinc.voyage.api.cucumber.util.VoyageConstants;
 import com.sun.glass.ui.Application;
@@ -34,7 +35,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -47,7 +47,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -117,13 +120,6 @@ public class VoyageApplicationPermissionsStepdefs {
      */
     @Value("${voyagestepdef.clientsecretvalue}")
     private String password;
-
-    /**.
-     *
-     */
-    @Value("${voyagestepdef.oauthtokenurl}")
-    private String oAuthTokenUrl;
-
     /**.
      *
      */
@@ -165,12 +161,6 @@ public class VoyageApplicationPermissionsStepdefs {
      */
     @Value("${voyagestepdefinvalidauthtoken.accesstoken}")
     private String accessToken;
-
-    /**.
-     *
-     */
-    @Value("${voyagestepdefinvalidauthtoken.serviceurlfopermissions}")
-    private String serviceUrlForPermissions;
     /**
      * .
      */
@@ -187,20 +177,36 @@ public class VoyageApplicationPermissionsStepdefs {
     @Value("${voyagestepdefinvalidauthtoken.responsemessage}")
     private String invalidAuthTokenResponseMessage;;
     /**.
-     * @return RestTemplate
+     * voyage api server url
      */
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
+    @Value("${voyageapi.serverurl}")
+    private String serverUrl;
     /**.
-     * @return response entity of successful generated token
+     * voyage api server api version
      */
-
+    @Value("${voyageapi.serverapiversion}")
+    private String serverApiVersion;
+    /**.
+     * voyage api oauth token path
+     */
+    @Value("${voyageapi.oauthpath}")
+    private String serverOauthPath;
+    /**
+     * Oauth2 token request url
+     */
+    private static String oAuthTokenUrl;
+    /**
+     *  response {@link Permission} class
+     */
+    private static List<Permission> permission;
+    /**
+     * initializing variables and constructing the oauth2 url for auth token
+     * generation
+     * @throws Exception
+     */
+    @PostConstruct
     public void init() throws Exception {
-        ResponseEntity token = getAuthToken();
-
+        oAuthTokenUrl = serverUrl + serverOauthPath;
     }
 
     private ResponseEntity getAuthToken() throws Exception {
@@ -258,7 +264,9 @@ public class VoyageApplicationPermissionsStepdefs {
     @When("^user requests for list of user permissions \"([^\"]*)\"$")
     public void userRequestsForListOfUserPermissions(String arg0) throws
                                                                   Throwable {
-        String serviceUrlForStatus = arg0;
+        String serviceUrlForPermissions = serverUrl + VoyageConstants
+                .FORWARD_SLASH + VoyageConstants.VOYAGE_API_VERSION
+                + VoyageConstants.VOYAGE_API_PERMISSIONS_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         authenticationJwtToken.getAccess_token());
@@ -267,8 +275,11 @@ public class VoyageApplicationPermissionsStepdefs {
         try {
             responseEntityForUserPermissionsRequest =
                     restTemplateBuilder.build()
-                    .exchange(serviceUrlForStatus, HttpMethod.GET, entity,
+                    .exchange(serviceUrlForPermissions, HttpMethod.GET, entity,
                             String.class);
+            permission = Utils.getUserPermissions
+                    (responseEntityForUserPermissionsRequest);
+            Assert.assertNotNull(permission);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -281,11 +292,17 @@ public class VoyageApplicationPermissionsStepdefs {
     public void iShouldObtainTheUserPermissions(String arg0) throws Throwable {
         Assert.assertTrue(responseEntityForUserPermissionsRequest
                 .getStatusCode() == HttpStatus.OK);
+        Assert.assertNotNull(permission.get(0).getName());
     }
 
     @When("^user requests for user permissions \"([^\"]*)\"$")
     public void userRequestsForUserPermissions(String arg0) throws Throwable {
-        String serviceUrlForStatus = arg0;
+        String serviceUrlForPermissions = serverUrl + VoyageConstants
+                .FORWARD_SLASH + VoyageConstants.VOYAGE_API_VERSION
+                + VoyageConstants.VOYAGE_API_PERMISSIONS_PATH
+                + VoyageConstants.FORWARD_SLASH
+                + VoyageConstants.VOYAGE_API_RETRIEVE_RECORD;
+
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         authenticationJwtToken.getAccess_token());
@@ -294,8 +311,11 @@ public class VoyageApplicationPermissionsStepdefs {
         try {
             responseEntityForUserPermissionsRequest =
                     restTemplateBuilder.build()
-                    .exchange(serviceUrlForStatus, HttpMethod.GET, entity,
+                    .exchange(serviceUrlForPermissions, HttpMethod.GET, entity,
                             String.class);
+                permission = Arrays.asList(Utils.getUserPermission
+                        (responseEntityForUserPermissionsRequest));
+            Assert.assertNotNull(permission);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -309,14 +329,15 @@ public class VoyageApplicationPermissionsStepdefs {
                                                                Throwable {
         Assert.assertTrue(responseEntityForUserPermissionsRequest
                 .getStatusCode() == HttpStatus.OK);
-        Assert.assertTrue(responseEntityForUserPermissionsRequest
-                .getBody() != null);
+        Assert.assertNotNull(permission.get(0).getName());
     }
 
     @When("^user requests for adding a new user permission \"([^\"]*)\"$")
     public void userRequestsForAddingANewUserPermission(String arg0)
             throws Throwable {
-        String serviceUrlForStatus = arg0;
+        String serviceUrlForPermissions = serverUrl + VoyageConstants
+                .FORWARD_SLASH + VoyageConstants.VOYAGE_API_VERSION
+                + VoyageConstants.VOYAGE_API_PERMISSIONS_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         authenticationJwtToken.getAccess_token());
@@ -326,10 +347,13 @@ public class VoyageApplicationPermissionsStepdefs {
         try {
             responseEntityForUserPermissionsRequest =
                     restTemplateBuilder.build()
-                    .exchange(serviceUrlForStatus, HttpMethod.POST, entity,
-                            String.class);
+                    .exchange(serviceUrlForPermissions, HttpMethod.POST,
+                            entity, String.class);
             Utils.writeIdToFile(DELETE_PERMISSIONS_INDEX_FILE,
                     responseEntityForUserPermissionsRequest.getBody());
+            permission = Arrays.asList(Utils.getUserPermission
+                    (responseEntityForUserPermissionsRequest));
+            Assert.assertNotNull(permission);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -361,6 +385,9 @@ public class VoyageApplicationPermissionsStepdefs {
     @When("^user requests for deleting a permission \"([^\"]*)\"$")
     public void userRequestsForDeletingAPermission(String arg0)
             throws Throwable {
+        String serviceUrlForPermissions = serverUrl + VoyageConstants
+                .FORWARD_SLASH + VoyageConstants.VOYAGE_API_VERSION
+                + VoyageConstants.VOYAGE_API_PERMISSIONS_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         authenticationJwtToken.getAccess_token());
@@ -370,16 +397,15 @@ public class VoyageApplicationPermissionsStepdefs {
         String deleteRecord = toBeDeletedRecord.substring(
                 toBeDeletedRecord.indexOf(BEGIN_INDEX_OF_COLON) + 1,
                 toBeDeletedRecord.indexOf(END_INDEX_DELETE_ID));
-        arg0 = arg0.substring(0, arg0.lastIndexOf('/') + 1) +  deleteRecord;
+        serviceUrlForPermissions += VoyageConstants.FORWARD_SLASH
+                            + deleteRecord;
         HttpEntity<Object> entity = new HttpEntity<Object>(headers);
 
         try {
             responseEntityForUserPermissionsRequest =
                     restTemplateBuilder.build()
-                    .exchange(arg0, HttpMethod.DELETE, entity,
+                    .exchange(serviceUrlForPermissions, HttpMethod.DELETE, entity,
                             String.class);
-            Utils.writeIdToFile(DELETE_PERMISSIONS_INDEX_FILE, "");
-
         } catch (Exception e) {
             e.printStackTrace();
             Assert.assertTrue(responseEntityForUserPermissionsRequest
@@ -391,6 +417,8 @@ public class VoyageApplicationPermissionsStepdefs {
             // be deleted as per http exception 201
             return;
             // not throwing the exception as its a negative testcase
+        } finally {
+            Utils.writeIdToFile(DELETE_PERMISSIONS_INDEX_FILE, "");
         }
         Assert.fail();
     }
@@ -418,6 +446,9 @@ public class VoyageApplicationPermissionsStepdefs {
     @When("^I request the login through JWT token for permissions$")
     public void iRequestTheLoginThroughJWTTokenForPermissions() throws
                                                                 Throwable {
+        String serviceUrlForPermissions = serverUrl + VoyageConstants
+                .FORWARD_SLASH + VoyageConstants.VOYAGE_API_VERSION +
+                VoyageConstants.VOYAGE_API_PERMISSIONS_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         accessToken);

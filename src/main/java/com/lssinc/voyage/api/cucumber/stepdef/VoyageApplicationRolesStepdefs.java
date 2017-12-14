@@ -20,6 +20,7 @@ package com.lssinc.voyage.api.cucumber.stepdef;
 
 import com.lssinc.voyage.api.cucumber.VoyageApiTestingCucumberApplication;
 import com.lssinc.voyage.api.cucumber.domain.AuthenticationJwtToken;
+import com.lssinc.voyage.api.cucumber.domain.Role;
 import com.lssinc.voyage.api.cucumber.util.Utils;
 import com.lssinc.voyage.api.cucumber.util.VoyageConstants;
 import com.sun.glass.ui.Application;
@@ -34,7 +35,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -47,7 +47,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -96,12 +99,6 @@ public class VoyageApplicationRolesStepdefs {
      */
     private static ResponseEntity<String> responseEntityUserList = null;
     /**
-     * .
-     * Rest template used to call rest services from Voyage API
-     */
-    @Autowired
-    private RestTemplateBuilder restTemplateBuilder;
-    /**
      * Authentication token of voyage application
      */
     private static AuthenticationJwtToken authenticationJwtToken;
@@ -110,61 +107,46 @@ public class VoyageApplicationRolesStepdefs {
      */
     @Value("${voyagestepdef.clientidvalue}")
     private String user;
-
     /**.
      *
      */
     @Value("${voyagestepdef.clientsecretvalue}")
     private String password;
-
-    /**.
-     *
-     */
-    @Value("${voyagestepdef.oauthtokenurl}")
-    private String oAuthTokenUrl;
-
     /**.
      *
      */
     @Value("${voyagestepdef.clientidvalue}")
     private String clientId;
-
     /**.
      *
      */
     @Value("${voyagestepdef.clientidvalue}")
     private String clientIdValue;
-
     /**.
      *
      */
     @Value("${voyagestepdef.clientsercret}")
     private String clientSecret;
-
     /**.
      *
      */
     @Value("${voyagestepdef.clientsecretvalue}")
     private String clientSecretValue;
-
     /**.
      *
      */
     @Value("${voyagestepdef.granttype}")
     private String grantType;
-
     /**.
      *
      */
     @Value("${voyagestepdef.granttypevalue}")
     private String grantTypeValue;
-
     /**.
      *
      */
     @Value("${voyagestepdef.granttypevalue}")
     private String accessToken;
-
     /**.
      *
      */
@@ -186,11 +168,42 @@ public class VoyageApplicationRolesStepdefs {
     @Value("${voyagestepdefinvalidauthtoken.responsemessage}")
     private String invalidAuthTokenResponseMessage;;
     /**.
+     * voyage api server url
+     */
+    @Value("${voyageapi.serverurl}")
+    private String serverUrl;
+    /**.
+     * voyage api server api version
+     */
+    @Value("${voyageapi.serverapiversion}")
+    private String serverApiVersion;
+    /**.
+     * voyage api oauth token path
+     */
+    @Value("${voyageapi.oauthpath}")
+    private String serverOauthPath;
+    /**
+     * Oauth2 token request url
+     */
+    private static String oAuthTokenUrl;
+    /**.
+     * rest template used to call rest services from Voyage API
      * @return RestTemplate
      */
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+    @Autowired
+    private RestTemplateBuilder restTemplateBuilder;
+    /**
+     * response {@link Role} class
+     */
+    private static List<Role> roles;
+    /**
+     * initializing variables and constructing the oauth2 url for auth token
+     * generation
+     * @throws Exception
+     */
+    @PostConstruct
+    public void init() throws Exception{
+        oAuthTokenUrl = serverUrl + serverOauthPath;
     }
 
     /**.
@@ -250,7 +263,10 @@ public class VoyageApplicationRolesStepdefs {
 
     @When("^user requests for list of user roles \"([^\"]*)\"$")
     public void userRequestsForListOfUserRoles(String arg0) throws Throwable {
-        String serviceUrlForStatus = arg0;
+        String serviceUrlForRoles = serverUrl + VoyageConstants
+                .FORWARD_SLASH + VoyageConstants
+                .VOYAGE_API_VERSION + VoyageConstants
+                .VOYAGE_API_ROLES_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         authenticationJwtToken.getAccess_token());
@@ -258,8 +274,10 @@ public class VoyageApplicationRolesStepdefs {
 
         try {
             responseEntityForUserRolesRequest = restTemplateBuilder.build()
-                    .exchange(serviceUrlForStatus, HttpMethod.GET, entity,
+                    .exchange(serviceUrlForRoles, HttpMethod.GET, entity,
                             String.class);
+            roles = Utils.getUserRoles(responseEntityForUserRolesRequest);
+            Assert.assertNotNull(roles);
         } catch (Exception e) {
             e.printStackTrace();
             HTTP_401_UNAUTHORIZED_MESSAGE = e.getMessage().trim();
@@ -289,14 +307,16 @@ public class VoyageApplicationRolesStepdefs {
     @Then("^I should obtain the user roles$")
     public void iShouldObtainTheUserRoleList(String arg0) throws Throwable {
         Assert.assertNotNull(responseEntityForUserRolesRequest);
-        Assert.assertTrue(
-           responseEntityForUserRolesRequest.getBody().length() > 0);
+        Assert.assertNotNull(roles.get(0).getName());
     }
 
     @And("^with users url \"([^\"]*)\"$")
     public void withUsersUrl(String arg0) throws Throwable {
         // invalid jwt token
-        String serviceUrlForStatus = arg0;
+        String serviceUrlForRoles = serverUrl + VoyageConstants
+                .FORWARD_SLASH + VoyageConstants
+                .VOYAGE_API_VERSION + VoyageConstants
+                .VOYAGE_API_ROLES_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         invalidAuthTokenAccessToken);
@@ -304,7 +324,7 @@ public class VoyageApplicationRolesStepdefs {
 
         try {
             responseEntityForUserRolesRequest = restTemplateBuilder.build()
-                    .exchange(serviceUrlForStatus, HttpMethod.GET, entity,
+                    .exchange(serviceUrlForRoles, HttpMethod.GET, entity,
                             String.class);
         } catch (Exception e) {
             e.printStackTrace();
@@ -321,7 +341,11 @@ public class VoyageApplicationRolesStepdefs {
 
     @When("^user requests for user roles \"([^\"]*)\"$")
     public void userRequestsForUserRoles(String arg0) throws Throwable {
-        String serviceUrlForStatus = arg0;
+        String serviceUrlForRoles = serverUrl + VoyageConstants
+                .FORWARD_SLASH + VoyageConstants
+                .VOYAGE_API_VERSION + VoyageConstants
+                .VOYAGE_API_ROLES_PATH + VoyageConstants
+                .FORWARD_SLASH + VoyageConstants.VOYAGE_API_RETRIEVE_RECORD;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         authenticationJwtToken.getAccess_token());
@@ -329,8 +353,11 @@ public class VoyageApplicationRolesStepdefs {
 
         try {
             responseEntityForUserRolesRequest = restTemplateBuilder.build()
-                    .exchange(serviceUrlForStatus, HttpMethod.GET, entity,
+                    .exchange(serviceUrlForRoles, HttpMethod.GET, entity,
                             String.class);
+            roles = Arrays.asList(Utils.getUserRole
+                    (responseEntityForUserRolesRequest));
+            Assert.assertNotNull(roles);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -343,11 +370,14 @@ public class VoyageApplicationRolesStepdefs {
     @Then("^I should obtain the user role by id$")
     public void iShouldObtainTheUserRoleById(String arg0) throws Throwable {
         Assert.assertNotNull(responseEntityForUserRolesRequest);
+        Assert.assertNotNull(roles.get(0).getName());
     }
 
     @When("^user requests for adding a new roles \"([^\"]*)\"$")
     public void userRequestsForAddingANewRoles(String arg0) throws Throwable {
-        String serviceUrlForStatus = arg0;
+        String serviceUrlForRoles = serverUrl + VoyageConstants.FORWARD_SLASH
+                + VoyageConstants.VOYAGE_API_VERSION
+                + VoyageConstants.VOYAGE_API_ROLES_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         authenticationJwtToken.getAccess_token());
@@ -356,7 +386,7 @@ public class VoyageApplicationRolesStepdefs {
 
         try {
             responseEntityForUserRolesRequest = restTemplateBuilder.build()
-                    .exchange(serviceUrlForStatus, HttpMethod.POST, entity,
+                    .exchange(serviceUrlForRoles, HttpMethod.POST, entity,
                             String.class);
             responseEntityForUserRolesRequest.getStatusCode();
             Utils.writeIdToFile(DELETE_ROLES_INDEX_FILE,
@@ -381,6 +411,9 @@ public class VoyageApplicationRolesStepdefs {
 
     @When("^user requests for deleting a roles \"([^\"]*)\"$")
     public void userRequestsForDeletingARoles(String arg0) throws Throwable {
+        String serviceUrlForRoles = serverUrl + VoyageConstants.FORWARD_SLASH
+                + VoyageConstants.VOYAGE_API_VERSION
+                + VoyageConstants.VOYAGE_API_ROLES_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         authenticationJwtToken.getAccess_token());
@@ -389,12 +422,12 @@ public class VoyageApplicationRolesStepdefs {
         String deleteRecord = toBeDeletedRecord.substring(
                 toBeDeletedRecord.indexOf(BEGIN_INDEX_OF_COLON) + 1,
                 toBeDeletedRecord.indexOf(END_INDEX_DELETE_ID));
-        arg0 = arg0.substring(0, arg0.lastIndexOf('/') + 1) +  deleteRecord;
+        serviceUrlForRoles += VoyageConstants.FORWARD_SLASH + deleteRecord;
         HttpEntity<Object> entity = new HttpEntity<Object>(headers);
 
         try {
             responseEntityForUserRolesRequest = restTemplateBuilder.build()
-                    .exchange(arg0, HttpMethod.DELETE, entity,
+                    .exchange(serviceUrlForRoles, HttpMethod.DELETE, entity,
                             String.class);
             responseEntityForUserRolesRequest.getStatusCode();
             Utils.writeIdToFile(DELETE_ROLES_INDEX_FILE, "");

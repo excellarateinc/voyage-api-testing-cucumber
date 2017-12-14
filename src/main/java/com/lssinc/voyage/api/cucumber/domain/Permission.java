@@ -20,6 +20,8 @@
 
 package com.lssinc.voyage.api.cucumber.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.validation.constraints.NotNull;
 
 /**
@@ -27,11 +29,46 @@ import javax.validation.constraints.NotNull;
  */
 public class Permission {
 
+    int id;
+
     @NotNull
     String name;
 
     String description;
 
     @NotNull
-    Boolean isImmutable = Boolean.FALSE;
+    @JsonProperty(value = "isImmutable")
+    String immutable;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getImmutable() {
+        return immutable;
+    }
+
+    public void setImmutable(String immutable) {
+        this.immutable = immutable;
+    }
 }

@@ -21,6 +21,7 @@ package com.lssinc.voyage.api.cucumber.stepdef;
 
 import com.lssinc.voyage.api.cucumber.VoyageApiTestingCucumberApplication;
 import com.lssinc.voyage.api.cucumber.domain.AuthenticationJwtToken;
+import com.lssinc.voyage.api.cucumber.domain.Status;
 import com.lssinc.voyage.api.cucumber.util.Utils;
 import com.lssinc.voyage.api.cucumber.util.VoyageConstants;
 import com.sun.glass.ui.Application;
@@ -47,6 +48,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,12 +86,6 @@ public class VoyageApplicationGetStatusStepdefs {
      */
     private static ResponseEntity<String> responseEntityForUserRequest = null;
     /**
-     * .
-     * Rest template used to call rest services from Voyage API
-     */
-    @Autowired
-    private RestTemplateBuilder restTemplateBuilder;
-    /**
      * Authentication token of voyage application
      */
     private static AuthenticationJwtToken authenticationJwtToken;
@@ -104,13 +100,6 @@ public class VoyageApplicationGetStatusStepdefs {
      */
     @Value("${voyagestepdef.clientsecretvalue}")
     private String password;
-
-    /**.
-     *
-     */
-    @Value("${voyagestepdef.oauthtokenurl}")
-    private String oAuthTokenUrl;
-
     /**.
      *
      */
@@ -156,13 +145,44 @@ public class VoyageApplicationGetStatusStepdefs {
      */
     @Value("${voyagestepdefinvalidauthtoken.serviceurlforstatus}")
     private String invalidAuthTokenServiceurlForStatus;
-    /**
     /**.
+     * voyage api server url
+     */
+    @Value("${voyageapi.serverurl}")
+    private String serverUrl;
+    /**.
+     * voyage api server api version
+     */
+    @Value("${voyageapi.serverapiversion}")
+    private String serverApiVersion;
+    /**.
+     * voyage api oauth token path
+     */
+    @Value("${voyageapi.oauthpath}")
+    private String serverOauthPath;
+    /**.
+     * rest template used to call rest services from Voyage API
      * @return RestTemplate
      */
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+    @Autowired
+    private RestTemplateBuilder restTemplateBuilder;
+
+    /**
+     * Oauth2 token request url
+     */
+    private static String oAuthTokenUrl;
+    /**
+     * response status class
+     */
+    private static Status status;
+    /**
+     * initializing variables and constructing the oauth2 url for auth token
+     * generation
+     * @throws Exception
+     */
+    @PostConstruct
+    public void init() throws Exception{
+        oAuthTokenUrl = serverUrl + serverOauthPath;
     }
 
     /**.
@@ -240,6 +260,7 @@ public class VoyageApplicationGetStatusStepdefs {
             responseEntityForUserRequest = restTemplateBuilder.build()
                     .exchange(serviceUrlForStatus, HttpMethod.GET, entity,
                             String.class);
+            status = Utils.getStatus(responseEntityForUserRequest);
         } catch (Exception e) {
             e.printStackTrace();
             HTTP_401_UNAUTHORIZED_MESSAGE = e.getMessage().trim();
@@ -251,9 +272,8 @@ public class VoyageApplicationGetStatusStepdefs {
 
     @Then("^I should obtain the following$")
     public void iShouldObtainTheFollowing(String arg0) throws Throwable {
-        Assert.assertNotNull(responseEntityForUserRequest);
-        Assert.assertTrue(responseEntityForUserRequest.toString()
-                .contains(VOYAGE_API_STATUS));
+        Assert.assertNotNull(status);
+        Assert.assertNotNull(status.getStatus());
         Assert.assertTrue(responseEntityForUserRequest.getStatusCode()
                 .toString().trim().equals(HttpStatus.OK.toString()));
     }

@@ -61,9 +61,9 @@ public class VoyageApiTestingController {
     /**
      * @return ResponseEntity - json response
      * @api {get} /automation/runIntegrationTesting voyage automation for
-     * runTestCaseForVoyageAPIAuthenticationToken
+     * runIntegrationTestCasesForVoyageAPI
      * @apiVersion 1.0.0
-     * @apiName runTestCaseForVoyageAPIAuthenticationToken
+     * @apiName runIntegrationTestCasesForVoyageAPI
      * @apiGroup authentication
      * @apiDescription triggers cucumber test cases
      * @apiExample {html} Example body:
@@ -79,7 +79,7 @@ public class VoyageApiTestingController {
     @RequestMapping(value = "/automation/runIntegrationTesting", produces = {
             "application/xml", "text/html", "text/xml" })
     @ResponseBody
-    public ResponseEntity runTestCaseForVoyageAPIAuthenticationToken() {
+    public ResponseEntity runIntegrationTestCasesForVoyageAPI() {
         try {
             serviceRunner.voyageApiAuthenticationRunner();
             serviceRunner.getCucumberReports();
