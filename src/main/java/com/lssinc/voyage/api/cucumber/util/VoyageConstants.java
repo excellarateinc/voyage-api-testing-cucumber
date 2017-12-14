@@ -97,5 +97,9 @@ public class VoyageConstants {
      * voyage constants roles api path
      */
     public static final String VOYAGE_API_USERS_PATH = "users";
+    /**
+     * voyage constants roles api path
+     */
+    public static final String VOYAGE_API_STATUS_PATH = "status";
 
 }

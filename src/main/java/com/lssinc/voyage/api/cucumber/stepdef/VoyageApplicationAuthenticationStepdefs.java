@@ -44,10 +44,12 @@ import org.springframework.http.client.support.BasicAuthorizationInterceptor;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,13 +79,13 @@ public class VoyageApplicationAuthenticationStepdefs {
      * Authentication token of voyage application
      */
     private static AuthenticationJwtToken authenticationJwtToken;
-    /**
-     * .
+    /**.
+     * user property loaded from properties file
      */
     @Value("${voyagestepdef.clientidvalue}")
     private String user;
-    /**
-     * .
+    /**.
+     * password property loaded from properties file
      */
     @Value("${voyagestepdef.clientsecretvalue}")
     private String password;
@@ -91,56 +93,51 @@ public class VoyageApplicationAuthenticationStepdefs {
      * Oauth2 token request url
      */
     private static String oAuthTokenUrl;
-    /**
-     * .
+    /**.
+     * client id placeholder property loaded from properties file
      */
     @Value("${voyagestepdef.clientid}")
     private String clientId;
-    /**
-     * .
+    /**.
+     * client id property loaded from properties file
      */
     @Value("${voyagestepdef.clientidvalue}")
     private String clientIdValue;
-    /**
-     * .
+    /**.
+     * client secret placeholder property loaded from properties file
      */
     @Value("${voyagestepdef.clientsercret}")
     private String clientSecret;
-    /**
-     * .
+    /**.
+     * client secret property loaded from properties file
      */
     @Value("${voyagestepdef.clientsecretvalue}")
     private String clientSecretValue;
-    /**
-     * .
+    /**.
+     *  grant type placeholder property loaded from properties file
      */
     @Value("${voyagestepdef.granttype}")
     private String grantType;
-    /**
-     * .
+    /**.
+     * grant type property loaded from properties file
      */
     @Value("${voyagestepdef.granttypevalue}")
     private String grantTypeValue;
-    /**
-     * .
+    /**.
+     * token name property loaded from properties file
      */
     @Value("${voyagestepdef.tokenname}")
     private String tokenName;
-    /**
-     * .
+    /**.
+     * invalid authentication token property loaded from properties file
      */
     @Value("${voyagestepdefinvalidauthtoken.accesstoken}")
     private String invalidAuthTokenAccessToken;
-    /**
-     * .
+    /**.
+     * invalid auth token service url property loaded from properties file
      */
     @Value("${voyagestepdefinvalidauthtoken.serviceurlforstatus}")
     private String invalidAuthTokenServiceurlForStatus;
-    /**
-     * .
-     */
-    @Value("${voyagestepdefinvalidauthtoken.responsemessage}")
-    private String invalidAuthTokenResponseMessage;
     /**.
      * voyage api server url
      */
@@ -178,7 +175,7 @@ public class VoyageApplicationAuthenticationStepdefs {
         URI url = null;
         try {
             url = new URI(oAuthTokenUrl);
-        } catch (Exception e) {
+        } catch (URISyntaxException e) {
             Assert.fail();
             throw e;
         }
@@ -259,7 +256,6 @@ public class VoyageApplicationAuthenticationStepdefs {
                             String.class);
             authenticationJwtToken = Utils.getAuthenticationJwtToken(response);
         } catch (Exception e) {
-            e.printStackTrace();
             Assert.fail();
             throw e;
         }
@@ -282,32 +278,6 @@ public class VoyageApplicationAuthenticationStepdefs {
     public void withUrl(String arg1) throws Throwable {
         Assert.assertEquals(invalidAuthTokenServiceurlForStatus, arg1);
     }
-
-    /*@When("^I request the login through JWT token$")
-    public void i_request_the_login_through_JWT_token() throws Throwable {
-        HttpHeaders headers =
-                Utils.buildBasicHttpHeadersForBearerAuthentication(
-                        invalidAuthTokenAccessToken);
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
-
-        try {
-            authenticationResponse = restTemplateBuilder.build()
-                    .exchange(invalidAuthTokenServiceurlForStatus,
-                            HttpMethod.GET, entity, String.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.assertTrue(e.getMessage().trim().equals(HttpStatus
-                    .UNAUTHORIZED.toString()));
-            HTTP_401_UNAUTHORIZED_MESSAGE = e.getMessage().trim();
-            if (authenticationResponse == null) {
-                authenticationResponse = new ResponseEntity<String>(HttpStatus
-                        .UNAUTHORIZED);
-            }
-            // not throwing the exception as its a negative testcase
-            return;
-        }
-        Assert.fail();
-    }*/
 
     @Then("^I should get a failed login message for authentication \"([^\"]*)"
             + "\"$")
@@ -338,8 +308,7 @@ public class VoyageApplicationAuthenticationStepdefs {
             authenticationResponse = restTemplateBuilder.build()
                     .exchange(invalidAuthTokenServiceurlForStatus,
                             HttpMethod.GET, entity, String.class);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (RestClientException e) {
             Assert.assertTrue(e.getMessage().trim().equals(HttpStatus
                     .UNAUTHORIZED.toString()));
             HTTP_401_UNAUTHORIZED_MESSAGE = e.getMessage().trim();

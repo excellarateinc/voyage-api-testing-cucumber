@@ -159,7 +159,7 @@ public class Utils {
             writer.write(body);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw e;
         } finally {
             writer.close();
         }
@@ -170,15 +170,15 @@ public class Utils {
      * @param fileName
      * @return
      */
-    public static String readFile(String fileName) {
+    public static String readFile(String fileName) throws IOException {
         File file = null;
         String readfile = null;
         try {
             file = new File(fileName);
             readfile = FileUtils.readFileToString(new File(fileName),
                     StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw e;
         } finally {
             file = null;
         }

@@ -45,6 +45,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
@@ -103,70 +104,50 @@ public class VoyageApplicationRolesStepdefs {
      */
     private static AuthenticationJwtToken authenticationJwtToken;
     /**.
-     *
+     * user property loaded from properties file
      */
     @Value("${voyagestepdef.clientidvalue}")
     private String user;
     /**.
-     *
+     * password property loaded from properties file
      */
     @Value("${voyagestepdef.clientsecretvalue}")
     private String password;
     /**.
-     *
+     * client id placeholder property loaded from properties file
      */
     @Value("${voyagestepdef.clientidvalue}")
     private String clientId;
     /**.
-     *
+     * client id property loaded from properties file
      */
     @Value("${voyagestepdef.clientidvalue}")
     private String clientIdValue;
     /**.
-     *
+     * client secret placeholder property loaded from properties file
      */
     @Value("${voyagestepdef.clientsercret}")
     private String clientSecret;
     /**.
-     *
+     * client secret property loaded from properties file
      */
     @Value("${voyagestepdef.clientsecretvalue}")
     private String clientSecretValue;
     /**.
-     *
+     * grant type placeholder property loaded from properties file
      */
     @Value("${voyagestepdef.granttype}")
     private String grantType;
     /**.
-     *
+     * grant type property loaded from properties file
      */
     @Value("${voyagestepdef.granttypevalue}")
     private String grantTypeValue;
-    /**.
-     *
-     */
-    @Value("${voyagestepdef.granttypevalue}")
-    private String accessToken;
-    /**.
-     *
-     */
-    @Value("${voyagestepdefinvalidauthtoken.serviceurlforoles}")
-    private String serviceUrlForRoles;
     /**
      * .
      */
     @Value("${voyagestepdefinvalidauthtoken.accesstoken}")
     private String invalidAuthTokenAccessToken;
-    /**
-     * .
-     */
-    @Value("${voyagestepdefinvalidauthtoken.serviceurlforstatus}")
-    private String invalidAuthTokenServiceurlForStatus;
-    /**
-     * .
-     */
-    @Value("${voyagestepdefinvalidauthtoken.responsemessage}")
-    private String invalidAuthTokenResponseMessage;;
     /**.
      * voyage api server url
      */
@@ -264,8 +245,7 @@ public class VoyageApplicationRolesStepdefs {
     @When("^user requests for list of user roles \"([^\"]*)\"$")
     public void userRequestsForListOfUserRoles(String arg0) throws Throwable {
         String serviceUrlForRoles = serverUrl + VoyageConstants
-                .FORWARD_SLASH + VoyageConstants
-                .VOYAGE_API_VERSION + VoyageConstants
+                .FORWARD_SLASH + serverApiVersion + VoyageConstants
                 .VOYAGE_API_ROLES_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
@@ -278,8 +258,7 @@ public class VoyageApplicationRolesStepdefs {
                             String.class);
             roles = Utils.getUserRoles(responseEntityForUserRolesRequest);
             Assert.assertNotNull(roles);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (RestClientException e) {
             HTTP_401_UNAUTHORIZED_MESSAGE = e.getMessage().trim();
             Assert.fail();
             // not throwing the exception as its a negative testcase
@@ -314,8 +293,7 @@ public class VoyageApplicationRolesStepdefs {
     public void withUsersUrl(String arg0) throws Throwable {
         // invalid jwt token
         String serviceUrlForRoles = serverUrl + VoyageConstants
-                .FORWARD_SLASH + VoyageConstants
-                .VOYAGE_API_VERSION + VoyageConstants
+                .FORWARD_SLASH + serverApiVersion + VoyageConstants
                 .VOYAGE_API_ROLES_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
@@ -326,8 +304,7 @@ public class VoyageApplicationRolesStepdefs {
             responseEntityForUserRolesRequest = restTemplateBuilder.build()
                     .exchange(serviceUrlForRoles, HttpMethod.GET, entity,
                             String.class);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (RestClientException e) {
             Assert.assertTrue(e.getMessage().trim()
                     .equals(HttpStatus.UNAUTHORIZED
                             .toString()));
@@ -342,8 +319,7 @@ public class VoyageApplicationRolesStepdefs {
     @When("^user requests for user roles \"([^\"]*)\"$")
     public void userRequestsForUserRoles(String arg0) throws Throwable {
         String serviceUrlForRoles = serverUrl + VoyageConstants
-                .FORWARD_SLASH + VoyageConstants
-                .VOYAGE_API_VERSION + VoyageConstants
+                .FORWARD_SLASH + serverApiVersion + VoyageConstants
                 .VOYAGE_API_ROLES_PATH + VoyageConstants
                 .FORWARD_SLASH + VoyageConstants.VOYAGE_API_RETRIEVE_RECORD;
         HttpHeaders headers = Utils
@@ -358,8 +334,7 @@ public class VoyageApplicationRolesStepdefs {
             roles = Arrays.asList(Utils.getUserRole
                     (responseEntityForUserRolesRequest));
             Assert.assertNotNull(roles);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (RestClientException e) {
             Assert.fail();
             return;
             // not throwing the exception as its a negative testcase
@@ -376,8 +351,7 @@ public class VoyageApplicationRolesStepdefs {
     @When("^user requests for adding a new roles \"([^\"]*)\"$")
     public void userRequestsForAddingANewRoles(String arg0) throws Throwable {
         String serviceUrlForRoles = serverUrl + VoyageConstants.FORWARD_SLASH
-                + VoyageConstants.VOYAGE_API_VERSION
-                + VoyageConstants.VOYAGE_API_ROLES_PATH;
+                + serverApiVersion + VoyageConstants.VOYAGE_API_ROLES_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         authenticationJwtToken.getAccess_token());
@@ -393,8 +367,7 @@ public class VoyageApplicationRolesStepdefs {
                     responseEntityForUserRolesRequest
                     .getBody());
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (RestClientException e) {
             Assert.fail();
             return;
             // not throwing the exception as its a negative testcase
@@ -412,7 +385,7 @@ public class VoyageApplicationRolesStepdefs {
     @When("^user requests for deleting a roles \"([^\"]*)\"$")
     public void userRequestsForDeletingARoles(String arg0) throws Throwable {
         String serviceUrlForRoles = serverUrl + VoyageConstants.FORWARD_SLASH
-                + VoyageConstants.VOYAGE_API_VERSION
+                + serverApiVersion
                 + VoyageConstants.VOYAGE_API_ROLES_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
@@ -432,8 +405,7 @@ public class VoyageApplicationRolesStepdefs {
             responseEntityForUserRolesRequest.getStatusCode();
             Utils.writeIdToFile(DELETE_ROLES_INDEX_FILE, "");
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (RestClientException e) {
             Assert.fail();
             return;
             // not throwing the exception as its a negative testcase

@@ -49,6 +49,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
@@ -100,76 +101,70 @@ public class VoyageApplicationUsersStepdefs {
      * Authentication token of voyage application
      */
     private static AuthenticationJwtToken authenticationJwtToken;
-    /**
-     * .
-     * application context
-     */
-    @Autowired
-    private ApplicationContext context;
     /**.
-     *
+     * user property loaded from properties file
      */
     @Value("${voyagestepdef.clientidvalue}")
     private String user;
 
     /**.
-     *
+     * password property loaded from properties file
      */
     @Value("${voyagestepdef.clientsecretvalue}")
     private String password;
     /**.
-     *
+     * client id placeholder property loaded from properties file
      */
     @Value("${voyagestepdef.clientidvalue}")
     private String clientId;
 
     /**.
-     *
+     * client id value property loaded from properties file
      */
     @Value("${voyagestepdef.clientidvalue}")
     private String clientIdValue;
 
     /**.
-     *
+     * client secret placeholder property loaded from properties file
      */
     @Value("${voyagestepdef.clientsercret}")
     private String clientSecret;
 
     /**.
-     *
+     * client secret property loaded from properties file
      */
     @Value("${voyagestepdef.clientsecretvalue}")
     private String clientSecretValue;
 
     /**.
-     *
+     * grant type placeholder property loaded from properties file
      */
     @Value("${voyagestepdef.granttype}")
     private String grantType;
 
     /**.
-     *
+     * grant type property loaded from properties file
      */
     @Value("${voyagestepdef.granttypevalue}")
     private String grantTypeValue;
 
     /**.
-     *
+     * invalid access token property loaded from properties files
      */
     @Value("${voyagestepdefinvalidauthtoken.accesstoken}")
     private String accessToken;
     /**.
-     * voyage api server url
+     * voyage api server url property loaded from properties file
      */
     @Value("${voyageapi.serverurl}")
     private String serverUrl;
     /**.
-     * voyage api server api version
+     * voyage api server api version property loaded from properties file
      */
     @Value("${voyageapi.serverapiversion}")
     private String serverApiVersion;
     /**.
-     * voyage api oauth token path
+     * voyage api oauth token path property loaded from properties file
      */
     @Value("${voyageapi.oauthpath}")
     private String serverOauthPath;
@@ -189,20 +184,25 @@ public class VoyageApplicationUsersStepdefs {
      * @throws Exception
      */
     @PostConstruct
-    public void init() throws Exception{
+    public void init() throws Exception {
         oAuthTokenUrl = serverUrl + serverOauthPath;
     }
-
     /**
      *  response {@link User} class
      */
     private static List<User> users;
 
     /**
-     * missing parameter error message
+     *  parameter error message
      */
     private static String HTTP_401_UNAUTHORIZED;
+    /**
+     * dynamically creating user names as the service doesn't accept duplicates
+     */
     private static String usernameForInserting;
+    /**
+     * Response entity for missing parameters
+     */
     private static ResponseEntity<String>
             responseEntityMissingRequiredParamUser;
 
@@ -265,8 +265,7 @@ public class VoyageApplicationUsersStepdefs {
     @When("^user requests for list of users \"([^\"]*)\"$")
     public void userRequestsFor(String arg0) throws Throwable {
         String serviceUrlForUsers = serverUrl + VoyageConstants
-                .FORWARD_SLASH + VoyageConstants
-                .VOYAGE_API_VERSION + VoyageConstants
+                .FORWARD_SLASH + serverApiVersion + VoyageConstants
                 .VOYAGE_API_USERS_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication
@@ -280,8 +279,7 @@ public class VoyageApplicationUsersStepdefs {
 
             users = Utils.getUsers(responseEntityForUserRequest);
             Assert.assertNotNull(users);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (RestClientException e) {
             Assert.fail();
             // not throwing the exception as its a negative testcase
         }
@@ -294,35 +292,10 @@ public class VoyageApplicationUsersStepdefs {
         Assert.assertNotNull(responseSaved);
     }
 
-/*    @And("^with users url for listing users\"([^\"]*)\"$")
-    public void withUsersUrl(String arg0) throws Throwable {
-        String token = context.getEnvironment().getProperty(""
-                + "voyagestepdefinvalidauthtoken.accesstoken");
-        HttpHeaders headers = Utils
-                .buildBasicHttpHeadersForBearerAuthentication(token);
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
-
-        try {
-            responseEntityUserList = restTemplateBuilder.build()
-                    .exchange(arg0, HttpMethod.GET, entity,
-                            String.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.assertTrue(e.getMessage().trim().equals(HttpStatus
-                    .UNAUTHORIZED.toString()));
-            HTTP_401_UNAUTHORIZED = e.getMessage().trim();
-            // not throwing the exception as its a negative testcase
-            return;
-        }
-        Assert.fail();
-    }*/
-
-
     @And("^with users url \"([^\"]*)\"  for listing users$")
     public void withUsersUrlForListingUsers(String arg0) throws Throwable {
         String serviceUrlForUsers = serverUrl + VoyageConstants
-                .FORWARD_SLASH + VoyageConstants
-                .VOYAGE_API_VERSION + VoyageConstants
+                .FORWARD_SLASH + serverApiVersion + VoyageConstants
                 .VOYAGE_API_USERS_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(accessToken);
@@ -332,7 +305,7 @@ public class VoyageApplicationUsersStepdefs {
             responseEntityUserList = restTemplateBuilder.build()
                     .exchange(serviceUrlForUsers, HttpMethod.GET, entity,
                             String.class);
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             e.printStackTrace();
             Assert.assertTrue(e.getMessage().trim().equals(HttpStatus
                     .UNAUTHORIZED.toString()));
@@ -352,8 +325,7 @@ public class VoyageApplicationUsersStepdefs {
     @When("^user requests for \"([^\"]*)\" creating user$")
     public void userRequestsForCreatingUser(String arg0) throws Throwable {
         String serviceUrlForUsers = serverUrl + VoyageConstants
-                .FORWARD_SLASH + VoyageConstants
-                .VOYAGE_API_VERSION + VoyageConstants
+                .FORWARD_SLASH + serverApiVersion + VoyageConstants
                 .VOYAGE_API_USERS_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication
@@ -369,7 +341,7 @@ public class VoyageApplicationUsersStepdefs {
                             String.class);
             Utils.writeIdToFile(DELETE_USER_FILE_INDEX, responseEntityUserList
                     .getBody());
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             e.printStackTrace();
             Assert.fail();
             // not throwing the exception as its a negative testcase
@@ -480,8 +452,7 @@ public class VoyageApplicationUsersStepdefs {
     userRequestsForCreatingUserWithMissingRequiredParameter(String arg0)
             throws Throwable {
         String serviceUrlForUsers = serverUrl + VoyageConstants
-                .FORWARD_SLASH + VoyageConstants
-                .VOYAGE_API_VERSION + VoyageConstants
+                .FORWARD_SLASH + serverApiVersion + VoyageConstants
                 .VOYAGE_API_USERS_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication
@@ -493,7 +464,7 @@ public class VoyageApplicationUsersStepdefs {
             responseEntityMissingRequiredParamUser = restTemplateBuilder
                     .build().exchange(serviceUrlForUsers, HttpMethod.POST,
                             httpEntity, String.class);
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             e.printStackTrace();
             responseEntityMissingRequiredParamUser = new
                     ResponseEntity<String>(HttpStatus.BAD_REQUEST);
@@ -518,8 +489,7 @@ public class VoyageApplicationUsersStepdefs {
     @When("^user requests for \"([^\"]*)\" deleting user$")
     public void userRequestsForDeletingUser(String arg0) throws Throwable {
         String serviceUrlForUsers = serverUrl + VoyageConstants
-                .FORWARD_SLASH + VoyageConstants
-                .VOYAGE_API_VERSION + VoyageConstants
+                .FORWARD_SLASH + serverApiVersion + VoyageConstants
                 .VOYAGE_API_USERS_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
@@ -541,7 +511,7 @@ public class VoyageApplicationUsersStepdefs {
             Utils.writeIdToFile(DELETE_USER_FILE_INDEX, "");
             HttpStatus status = responseEntityUserList.getStatusCode();
             Assert.assertTrue(status == HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             e.printStackTrace();
             Assert.fail();
             // not throwing the exception as its a negative testcase
@@ -561,8 +531,8 @@ public class VoyageApplicationUsersStepdefs {
     @When("^user requests for \"([^\"]*)\" user details by id$")
     public void userRequestsForUserDetailsById(String arg0) throws Throwable {
         String serviceUrlForUsers = serverUrl + VoyageConstants.FORWARD_SLASH +
-                VoyageConstants.VOYAGE_API_VERSION + VoyageConstants
-                .VOYAGE_API_USERS_PATH + VoyageConstants.FORWARD_SLASH
+                serverApiVersion + VoyageConstants.VOYAGE_API_USERS_PATH
+                + VoyageConstants.FORWARD_SLASH
                 + VoyageConstants.VOYAGE_API_RETRIEVE_RECORD;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication
@@ -575,7 +545,7 @@ public class VoyageApplicationUsersStepdefs {
                             String.class);
             Assert.assertTrue(HttpStatus.OK.toString().equals(
                     responseEntityUserList.getStatusCode().toString().trim()));
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             e.printStackTrace();
             Assert.fail();
             return;
@@ -593,8 +563,8 @@ public class VoyageApplicationUsersStepdefs {
     public void userRequestsForUpdatingUserDetailsById(String arg0)
             throws Throwable {
         String serviceUrlForUsers = serverUrl + VoyageConstants.FORWARD_SLASH +
-                VoyageConstants.VOYAGE_API_VERSION + VoyageConstants
-                .VOYAGE_API_USERS_PATH + VoyageConstants.FORWARD_SLASH
+                serverApiVersion + VoyageConstants.VOYAGE_API_USERS_PATH
+                + VoyageConstants.FORWARD_SLASH
                 + VoyageConstants.VOYAGE_API_RETRIEVE_RECORD;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication
@@ -607,7 +577,7 @@ public class VoyageApplicationUsersStepdefs {
                     .exchange(serviceUrlForUsers, HttpMethod.PUT, httpEntity,
                             String.class);
             users = Utils.getUsers(responseEntityForUserRequest);
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             e.printStackTrace();
             Assert.fail();
             // not throwing the exception as its a negative testcase
@@ -637,7 +607,7 @@ public class VoyageApplicationUsersStepdefs {
                             String.class);
             Assert.assertTrue(HttpStatus.UNAUTHORIZED.toString().equals(
                     responseEntityUserList.getStatusCode().toString().trim()));
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             e.printStackTrace();
             Assert.assertTrue(e.getMessage().trim().equals(HttpStatus
                     .UNAUTHORIZED.toString()));

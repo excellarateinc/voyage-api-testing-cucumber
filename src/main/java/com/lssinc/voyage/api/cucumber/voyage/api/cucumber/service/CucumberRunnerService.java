@@ -56,7 +56,7 @@ public class CucumberRunnerService {
     }
 
     /**.
-     *
+     * generated the cucumber reports
      */
     public void getCucumberReports() throws Exception {
         try {

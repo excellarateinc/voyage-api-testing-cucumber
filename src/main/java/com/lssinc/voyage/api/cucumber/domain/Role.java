@@ -24,6 +24,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
+/**
+ * Role class
+ */
 public class Role {
 
     int id;

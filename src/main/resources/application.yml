@@ -41,7 +41,8 @@ security:
 ---
 voyageapi:
   serverurl: http://localhost:8080
-  serverapiversion: /api/v1
+  serverapiversion: api/v1/
+  apiversion: api/
   oauthpath: /oauth/token
 
 voyagestepdef:
@@ -69,6 +70,7 @@ cucumberproperties:
   outputdirectory: src/main/resources/static
   outputname: cucumber-results
   sourcefile: src/main/resources/static/cucumber.json
+  aggregatereport: http://localhost:8083/cucumber-results-agg-test-results.html
 
 #######################################################################################################################
 #

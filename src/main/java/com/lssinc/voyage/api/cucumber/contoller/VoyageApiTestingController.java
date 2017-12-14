@@ -22,6 +22,7 @@ import com.lssinc.voyage.api.cucumber.CucumberRunner;
 import com.lssinc.voyage.api.cucumber.voyage.api.cucumber.service
         .CucumberRunnerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -58,9 +59,15 @@ public class VoyageApiTestingController {
      */
     @Autowired
     private CucumberRunnerService serviceRunner;
+    /**.
+     * cucumber reports url
+     */
+    @Value("${cucumberproperties.aggregatereport}")
+    private String reportsUrl;
+
     /**
      * @return ResponseEntity - json response
-     * @api {get} /automation/runIntegrationTesting voyage automation for
+     * @api {get} /automation/run voyage automation for
      * runIntegrationTestCasesForVoyageAPI
      * @apiVersion 1.0.0
      * @apiName runIntegrationTestCasesForVoyageAPI
@@ -73,10 +80,10 @@ public class VoyageApiTestingController {
      * @apiHeaderExample {json} Voyage API Authentication Token Test
      * HTTP/1.1 201: Created
      * {
-     * "Location": "https://my-app/api/v1/automation/runIntegrationTesting"
+     * "Location": "https://my-app/api/v1/automation/run"
      * }
      **/
-    @RequestMapping(value = "/automation/runIntegrationTesting", produces = {
+    @RequestMapping(value = "/automation/run", produces = {
             "application/xml", "text/html", "text/xml" })
     @ResponseBody
     public ResponseEntity runIntegrationTestCasesForVoyageAPI() {
@@ -85,12 +92,10 @@ public class VoyageApiTestingController {
             serviceRunner.getCucumberReports();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.TEXT_HTML);
-            String url = "http://localhost:8083/cucumber-results-agg-test"
-                    + "-results.html";
             //set response entity
             HttpEntity<Object> entity = new HttpEntity<Object>(headers);
             ResponseEntity<String> responseEntity =
-                    restTemplateBuilder.build().exchange(url, HttpMethod.GET,
+                    restTemplateBuilder.build().exchange(reportsUrl, HttpMethod.GET,
                             entity, String.class);
             return responseEntity;
         } catch (Exception e) {
@@ -104,10 +109,10 @@ public class VoyageApiTestingController {
         }
     }
 
-    /**.
-     *
-      * @return
-     */
+   /**.
+    *
+    * @return
+    */
     @RequestMapping("/{path:[^\\.]+}*")
     public String forward() {
         return "forward:/index.html";

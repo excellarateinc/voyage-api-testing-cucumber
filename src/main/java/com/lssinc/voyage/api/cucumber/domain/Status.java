@@ -18,10 +18,8 @@
  */
 package com.lssinc.voyage.api.cucumber.domain;
 
-import org.joda.time.DateTime;
-
 /**
- * response status class placeholder
+ * response status class
  */
 public class Status {
 
