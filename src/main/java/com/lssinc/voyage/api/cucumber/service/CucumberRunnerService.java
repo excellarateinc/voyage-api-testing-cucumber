@@ -16,15 +16,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lssinc.voyage.api.cucumber.voyage.api.cucumber.service;
+package com.lssinc.voyage.api.cucumber.service;
 
 import com.github.mkolisnyk.cucumber.reporting.CucumberDetailedResults;
+import com.lssinc.voyage.api.cucumber.CucumberRunner;
 import org.junit.runner.Computer;
 import org.junit.runner.JUnitCore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-import com.lssinc.voyage.api.cucumber.CucumberRunner;
 
 /**.
  *  cucumber runner service runs the specific cucumber integration test
@@ -49,7 +49,6 @@ public class CucumberRunnerService {
             JUnitCore jUnitCore = new JUnitCore();
             jUnitCore.run(computer, CucumberRunner.class);
         } catch (Exception e) {
-            e.printStackTrace();
             throw e;
         }
 
@@ -76,7 +75,6 @@ public class CucumberRunnerService {
             results.execute(true);
 
         } catch (Exception e) {
-            e.printStackTrace();
             throw e;
         }
     }

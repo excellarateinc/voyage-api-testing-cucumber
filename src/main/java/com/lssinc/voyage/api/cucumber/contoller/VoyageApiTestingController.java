@@ -19,8 +19,7 @@
 package com.lssinc.voyage.api.cucumber.contoller;
 
 import com.lssinc.voyage.api.cucumber.CucumberRunner;
-import com.lssinc.voyage.api.cucumber.voyage.api.cucumber.service
-        .CucumberRunnerService;
+import com.lssinc.voyage.api.cucumber.service.CucumberRunnerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
