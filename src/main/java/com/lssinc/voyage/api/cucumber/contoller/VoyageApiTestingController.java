@@ -88,7 +88,7 @@ public class VoyageApiTestingController {
     public ResponseEntity runIntegrationTestCasesForVoyageAPI() {
         try {
             serviceRunner.voyageApiAuthenticationRunner();
-            serviceRunner.getCucumberReports();
+            serviceRunner.generateCucumberReports();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.TEXT_HTML);
             //set response entity

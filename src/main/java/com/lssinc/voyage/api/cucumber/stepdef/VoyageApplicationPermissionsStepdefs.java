@@ -88,7 +88,7 @@ public class VoyageApplicationPermissionsStepdefs {
      * .
      * saves the token response
      */
-    private static ResponseEntity responseSaved = null;
+    private ResponseEntity responseSaved = null;
     /**
      * .
      * stores the response entity for user request test case, it will be used

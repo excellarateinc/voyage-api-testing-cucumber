@@ -69,7 +69,7 @@ public class VoyageApplicationAuthenticationStepdefs {
     /**.
      *  oauth2 authentication response
      */
-    private static ResponseEntity<String> authenticationResponse;
+    private ResponseEntity<String> authenticationResponse;
     /**
      * .
      *  is used to verifying step for using invalid bearer token

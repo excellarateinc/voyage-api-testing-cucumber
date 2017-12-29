@@ -85,17 +85,17 @@ public class VoyageApplicationUsersStepdefs {
      * .
      * saves the token response
      */
-    private static ResponseEntity responseSaved = null;
+    private ResponseEntity responseSaved;
     /**
      * .
      * stores the response entity for user request test case, it will be used
      * in the next test case
      */
-    private static ResponseEntity<String> responseEntityForUserRequest = null;
+    private static ResponseEntity<String> responseEntityForUserRequest;
     /**.
      *
      */
-    private static ResponseEntity<String> responseEntityUserList = null;
+    private ResponseEntity<String> responseEntityUserList = null;
     /**
      * Authentication token of voyage application
      */
@@ -202,8 +202,7 @@ public class VoyageApplicationUsersStepdefs {
     /**
      * Response entity for missing parameters
      */
-    private static ResponseEntity<String>
-            responseEntityMissingRequiredParamUser;
+    private ResponseEntity<String> responseEntityMissingRequiredParamUser;
 
     /**.
      * @return RestTemplate

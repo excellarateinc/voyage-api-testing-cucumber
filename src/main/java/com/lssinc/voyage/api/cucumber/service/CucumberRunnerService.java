@@ -55,9 +55,9 @@ public class CucumberRunnerService {
     }
 
     /**.
-     * generated the cucumber reports
+     * generates the cucumber detailed reports
      */
-    public void getCucumberReports() throws Exception {
+    public void generateCucumberReports() throws Exception {
         try {
             String cucumberOutputFolder =
             context.getEnvironment().getProperty(""

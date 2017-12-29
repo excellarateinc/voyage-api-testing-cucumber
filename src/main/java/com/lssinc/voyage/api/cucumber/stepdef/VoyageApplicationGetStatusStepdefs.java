@@ -66,11 +66,6 @@ import java.util.Map;
 public class VoyageApplicationGetStatusStepdefs {
     /**
      * .
-     * voyage api status
-     */
-    public static final String VOYAGE_API_STATUS = "status";
-    /**
-     * .
      * saves the token response
      */
     private static ResponseEntity responseToken = null;
@@ -84,7 +79,7 @@ public class VoyageApplicationGetStatusStepdefs {
      * stores the response entity for user request test case, it will be used
      * in the next test case
      */
-    private static ResponseEntity<String> responseEntityForUserRequest = null;
+    private ResponseEntity<String> responseEntityForUserRequest = null;
     /**
      * Authentication token of voyage application
      */

@@ -44,6 +44,10 @@ voyageapi:
   serverapiversion: api/v1/
   apiversion: api/
   oauthpath: /oauth/token
+  dotnet:
+    serverurl: http://localhost:52431
+    oauthpath: /OAuth/Token
+    serverurlforapi: http://localhost:55850
 
 voyagestepdef:
   authtypebasic: "Basic"

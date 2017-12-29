@@ -82,7 +82,7 @@ public class VoyageApplicationRolesStepdefs {
      * .
      * saves the token response
      */
-    private static ResponseEntity responseSaved = null;
+    private ResponseEntity responseSaved = null;
     /**
      * .
      *  used to verifying step for using invalid bearer token
@@ -93,13 +93,9 @@ public class VoyageApplicationRolesStepdefs {
      * stores the response entity for user request test case, it will be used
      * in the next test case
      */
-    private static ResponseEntity<String>
+    private ResponseEntity<String>
             responseEntityForUserRolesRequest = null;
-    /**.
-     *
-     */
-    private static ResponseEntity<String> responseEntityUserList = null;
-    /**
+     /**
      * Authentication token of voyage application
      */
     private static AuthenticationJwtToken authenticationJwtToken;
