@@ -52,6 +52,11 @@ Run the gradle build
 
 Observer the server startup
 
+Install voyage java api server on 8080 port and start the server, you will also 
+need voyage dotnet api server running on 52431 and web server on 55850 port, 
+the configuration related to those applications are present in their respective 
+product deployment documentation
+
 from the browser Run this:
 
     http://localhost:8083/api/v1/automation/run
