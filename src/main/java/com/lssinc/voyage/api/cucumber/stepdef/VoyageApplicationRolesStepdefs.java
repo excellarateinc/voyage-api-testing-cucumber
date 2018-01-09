@@ -69,15 +69,16 @@ public class VoyageApplicationRolesStepdefs {
     /**
      * stored the index of the role that needs to be deleted
      */
-    public static final String DELETE_ROLES_INDEX_FILE = "deleteRolesIndexFile";
+    private static final String DELETE_ROLES_INDEX_FILE =
+            "deleteRolesIndexFile";
     /**
      * end index to find the inserted/ to be deleted record id
      */
-    public static final char END_INDEX_DELETE_ID = ',';
+    private static final char END_INDEX_DELETE_ID = ',';
     /**
      * starting index to find the inserted/ to be deleted record id
      */
-    public static final char BEGIN_INDEX_OF_COLON = ':';
+    private static final char BEGIN_INDEX_OF_COLON = ':';
     /**
      * .
      * saves the token response
@@ -190,7 +191,7 @@ public class VoyageApplicationRolesStepdefs {
         ResponseEntity<String> response = null;
         try {
             // constructing property map for constructing rest webservice url
-            Map<String, String> propertiesMap = new HashMap<String, String>();
+            Map<String, String> propertiesMap = new HashMap<>();
             propertiesMap.put(VoyageConstants.VOYAGE_API_USER, user);
             propertiesMap.put(VoyageConstants.VOYAGE_API_USER_PASSWORD,
                     password);
@@ -246,7 +247,7 @@ public class VoyageApplicationRolesStepdefs {
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         authenticationJwtToken.getAccess_token());
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         try {
             responseEntityForUserRolesRequest = restTemplateBuilder.build()
@@ -294,7 +295,7 @@ public class VoyageApplicationRolesStepdefs {
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         invalidAuthTokenAccessToken);
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         try {
             responseEntityForUserRolesRequest = restTemplateBuilder.build()
@@ -321,7 +322,7 @@ public class VoyageApplicationRolesStepdefs {
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         authenticationJwtToken.getAccess_token());
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         try {
             responseEntityForUserRolesRequest = restTemplateBuilder.build()
@@ -352,7 +353,7 @@ public class VoyageApplicationRolesStepdefs {
                 .buildBasicHttpHeadersForBearerAuthentication(
                         authenticationJwtToken.getAccess_token());
         String body =  updateRequestBodyForUpdating();
-        HttpEntity<Object> entity = new HttpEntity<Object>(body, headers);
+        HttpEntity<Object> entity = new HttpEntity<>(body, headers);
 
         try {
             responseEntityForUserRolesRequest = restTemplateBuilder.build()
@@ -392,7 +393,7 @@ public class VoyageApplicationRolesStepdefs {
                 toBeDeletedRecord.indexOf(BEGIN_INDEX_OF_COLON) + 1,
                 toBeDeletedRecord.indexOf(END_INDEX_DELETE_ID));
         serviceUrlForRoles += VoyageConstants.FORWARD_SLASH + deleteRecord;
-        HttpEntity<Object> entity = new HttpEntity<Object>(headers);
+        HttpEntity<Object> entity = new HttpEntity<>(headers);
 
         try {
             responseEntityForUserRolesRequest = restTemplateBuilder.build()

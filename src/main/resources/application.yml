@@ -47,7 +47,17 @@ voyageapi:
   dotnet:
     serverurl: http://localhost:52431
     oauthpath: /OAuth/Token
+    username: admin@admin.com
+    password: Hello123!
     serverurlforapi: http://localhost:55850
+    authorizationurl: http://localhost:52431
+    authorizationpath: /oauth/authorize
+    clientsuper: client-super
+    redirecturl: http://localhost:3000
+    redirectpath1: /dashboard
+    responsetype: token
+    submitvoyageauthorizationform: http://localhost:8083/VoyageRdirectSubmitForm.html
+    granttypevalue: password
 
 voyagestepdef:
   authtypebasic: "Basic"

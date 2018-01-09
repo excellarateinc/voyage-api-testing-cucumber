@@ -222,7 +222,7 @@ public class VoyageApplicationAuthenticationStepdefs {
         ResponseEntity<String> response = null;
         try {
 
-            Map<String, String> propertiesMap = new HashMap<String, String>();
+            Map<String, String> propertiesMap = new HashMap<>();
             propertiesMap.put(VoyageConstants.VOYAGE_API_USER, user);
             propertiesMap.put(VoyageConstants.VOYAGE_API_USER_PASSWORD,
                     password);
@@ -302,7 +302,7 @@ public class VoyageApplicationAuthenticationStepdefs {
         HttpHeaders headers =
                 Utils.buildBasicHttpHeadersForBearerAuthentication(
                         invalidAuthTokenAccessToken);
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         try {
             authenticationResponse = restTemplateBuilder.build()

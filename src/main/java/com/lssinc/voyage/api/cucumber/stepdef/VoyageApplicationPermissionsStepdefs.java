@@ -74,7 +74,7 @@ public class VoyageApplicationPermissionsStepdefs {
     /**
      * stored the index of the role that needs to be deleted
      */
-    public static final String DELETE_PERMISSIONS_INDEX_FILE =
+    private static final String DELETE_PERMISSIONS_INDEX_FILE =
             "deletePermissionsIndexFile";
     /**
      * end index to find the inserted/ to be deleted record id
@@ -96,10 +96,6 @@ public class VoyageApplicationPermissionsStepdefs {
      */
     private static ResponseEntity<String>
             responseEntityForUserPermissionsRequest = null;
-    /**.
-     *
-     */
-    private static ResponseEntity<String> responseEntityUserList = null;
     /**
      * .
      * Rest template used to call rest services from Voyage API
@@ -176,7 +172,7 @@ public class VoyageApplicationPermissionsStepdefs {
      * .
      */
     @Value("${voyagestepdefinvalidauthtoken.responsemessage}")
-    private String invalidAuthTokenResponseMessage;;
+    private String invalidAuthTokenResponseMessage;
     /**.
      * voyage api server url
      */
@@ -214,7 +210,7 @@ public class VoyageApplicationPermissionsStepdefs {
         ResponseEntity<String> response = null;
         try {
             // constructing property map for constructing rest webservice url
-            Map<String, String> propertiesMap = new HashMap<String, String>();
+            Map<String, String> propertiesMap = new HashMap<>();
             propertiesMap.put(VoyageConstants.VOYAGE_API_USER, user);
             propertiesMap.put(VoyageConstants.VOYAGE_API_USER_PASSWORD,
                     password);
@@ -271,7 +267,7 @@ public class VoyageApplicationPermissionsStepdefs {
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         authenticationJwtToken.getAccess_token());
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         try {
             responseEntityForUserPermissionsRequest =
@@ -306,7 +302,7 @@ public class VoyageApplicationPermissionsStepdefs {
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         authenticationJwtToken.getAccess_token());
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         try {
             responseEntityForUserPermissionsRequest =
@@ -341,7 +337,7 @@ public class VoyageApplicationPermissionsStepdefs {
                 .buildBasicHttpHeadersForBearerAuthentication(
                         authenticationJwtToken.getAccess_token());
         String body = updateRequestBodyForUpdating();
-        HttpEntity<Object> entity = new HttpEntity<Object>(body, headers);
+        HttpEntity<Object> entity = new HttpEntity<>(body, headers);
 
         try {
             responseEntityForUserPermissionsRequest =
@@ -398,7 +394,7 @@ public class VoyageApplicationPermissionsStepdefs {
                 toBeDeletedRecord.indexOf(END_INDEX_DELETE_ID));
         serviceUrlForPermissions += VoyageConstants.FORWARD_SLASH
                             + deleteRecord;
-        HttpEntity<Object> entity = new HttpEntity<Object>(headers);
+        HttpEntity<Object> entity = new HttpEntity<>(headers);
 
         try {
             responseEntityForUserPermissionsRequest =
@@ -451,7 +447,7 @@ public class VoyageApplicationPermissionsStepdefs {
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         accessToken);
-        HttpEntity<Object> entity = new HttpEntity<Object>(headers);
+        HttpEntity<Object> entity = new HttpEntity<>(headers);
 
         try {
             responseEntityForUserPermissionsRequest =

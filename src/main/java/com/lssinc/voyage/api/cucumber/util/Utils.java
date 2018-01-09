@@ -67,17 +67,13 @@ public class Utils {
     public static HttpEntity
     buildAuthTokenHeadersAndRequestBody(Map propertiesMap)
             throws UnsupportedEncodingException {
-
-        ResponseEntity<String> response = null;
-
         HttpHeaders headers =
                 buildBasicAuthenticationHttpHeader(
                         propertiesMap.get(VoyageConstants.VOYAGE_API_USER)
                                 .toString(),
                         propertiesMap.get(VoyageConstants
                                 .VOYAGE_API_USER_PASSWORD).toString());
-        HttpEntity httpEntity = buildRequestBody(headers, propertiesMap);
-        return httpEntity;
+        return buildRequestBody(headers, propertiesMap);
     }
 
     /**
@@ -106,8 +102,7 @@ public class Utils {
      */
     static HttpEntity buildRequestBody(HttpHeaders headers,
                                        Map propertiesMap) {
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<String,
-                String>();
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add(propertiesMap.get(VoyageConstants.VOYAGE_API_CLIENT_ID)
                         .toString(),
                 propertiesMap.get(VoyageConstants.VOYAGE_API_CLIENT_ID_VALUE)
@@ -124,9 +119,7 @@ public class Utils {
         body.add(propertiesMap.get(VoyageConstants.REQUEST_SCOPE).toString(),
                 "");
 
-        HttpEntity<?> httpEntity = new HttpEntity<Object>(body, headers);
-
-        return httpEntity;
+        return new HttpEntity<Object>(body, headers);
     }
 
     /**
@@ -161,7 +154,9 @@ public class Utils {
         } catch (IOException e) {
             throw e;
         } finally {
-            writer.close();
+            if (writer != null) {
+                writer.close();
+            }
         }
     }
 
@@ -208,9 +203,7 @@ public class Utils {
         String responseBody = response.getBody();
         InputStream stream = new ByteArrayInputStream(responseBody
                 .getBytes(StandardCharsets.UTF_8.name()));
-        AuthenticationJwtToken authenticationJwtToken =
-                mapper.readValue(stream, AuthenticationJwtToken.class);
-        return authenticationJwtToken;
+        return mapper.readValue(stream, AuthenticationJwtToken.class);
     }
 
     /**
@@ -225,9 +218,7 @@ public class Utils {
         String responseBody = response.getBody();
         InputStream stream = new ByteArrayInputStream(responseBody
                 .getBytes(StandardCharsets.UTF_8.name()));
-        Status status =
-                mapper.readValue(stream, Status.class);
-        return status;
+        return mapper.readValue(stream, Status.class);
     }
 
 
@@ -243,9 +234,7 @@ public class Utils {
         String responseBody = response.getBody();
         InputStream stream = new ByteArrayInputStream(responseBody
                 .getBytes(StandardCharsets.UTF_8.name()));
-        Role role =
-                mapper.readValue(stream, Role.class);
-        return role;
+        return mapper.readValue(stream, Role.class);
     }
 
     /**
@@ -260,9 +249,7 @@ public class Utils {
         String responseBody = response.getBody();
         InputStream stream = new ByteArrayInputStream(responseBody
                 .getBytes(StandardCharsets.UTF_8.name()));
-        List<Permission> permission =
-                Arrays.asList(mapper.readValue(stream, Permission[].class));
-        return permission;
+        return Arrays.asList(mapper.readValue(stream, Permission[].class));
     }
 
     /**
@@ -277,9 +264,7 @@ public class Utils {
         String responseBody = response.getBody();
         InputStream stream = new ByteArrayInputStream(responseBody
                 .getBytes(StandardCharsets.UTF_8.name()));
-        Permission permission =
-                mapper.readValue(stream, Permission.class);
-        return permission;
+        return mapper.readValue(stream, Permission.class);
     }
 
     /**
@@ -294,8 +279,7 @@ public class Utils {
     String responseBody = response.getBody();
     InputStream stream = new ByteArrayInputStream(responseBody
             .getBytes(StandardCharsets.UTF_8.name()));
-       List<Role> roles = Arrays.asList(mapper.readValue(stream, Role[].class));
-    return roles;
+    return Arrays.asList(mapper.readValue(stream, Role[].class));
     }
 
     /**
@@ -310,9 +294,7 @@ public class Utils {
         String responseBody = response.getBody();
         InputStream stream = new ByteArrayInputStream(responseBody
                 .getBytes(StandardCharsets.UTF_8.name()));
-        List<User> users = Arrays.asList(mapper.readValue(stream, User[]
-                .class));
-        return users;
+        return Arrays.asList(mapper.readValue(stream, User[].class));
     }
 
     /**
@@ -327,7 +309,6 @@ public class Utils {
         String responseBody = response.getBody();
         InputStream stream = new ByteArrayInputStream(responseBody
                 .getBytes(StandardCharsets.UTF_8.name()));
-        User users = mapper.readValue(stream, User.class);
-        return users;
+        return mapper.readValue(stream, User.class);
     }
 }

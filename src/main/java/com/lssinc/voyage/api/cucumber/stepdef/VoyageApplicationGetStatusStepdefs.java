@@ -176,7 +176,7 @@ public class VoyageApplicationGetStatusStepdefs {
         ResponseEntity<String> response = null;
         try {
             // constructing property map for constructing rest webservice url
-            Map<String, String> propertiesMap = new HashMap<String, String>();
+            Map<String, String> propertiesMap = new HashMap<>();
             propertiesMap.put(VoyageConstants.VOYAGE_API_USER, user);
             propertiesMap.put(VoyageConstants.VOYAGE_API_USER_PASSWORD,
                     password);
@@ -240,7 +240,7 @@ public class VoyageApplicationGetStatusStepdefs {
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication
                         (authenticationJwtToken.getAccess_token());
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         try {
             responseEntityForUserRequest = restTemplateBuilder.build()
@@ -276,7 +276,7 @@ public class VoyageApplicationGetStatusStepdefs {
         HttpHeaders headers =
                 Utils.buildBasicHttpHeadersForBearerAuthentication(
                         invalidAuthTokenAccessToken);
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         try {
             responseEntityForUserRequest = restTemplateBuilder.build()

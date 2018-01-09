@@ -71,12 +71,12 @@ public class VoyageApplicationUsersStepdefs {
     /**
      * file to store the to be deleted index
      */
-    public static final String DELETE_USER_FILE_INDEX = "deleteUserFileIndex"
+    private static final String DELETE_USER_FILE_INDEX = "deleteUserFileIndex"
             + ".txt";
     /**
      * end index to find the inserted/ to be deleted record id
      */
-    public static final char END_INDEX_DELETE_ID = ',';
+    private static final char END_INDEX_DELETE_ID = ',';
     /**
      * starting index to find the inserted/ to be deleted record id
      */
@@ -219,7 +219,7 @@ public class VoyageApplicationUsersStepdefs {
         ResponseEntity<String> response = null;
         try {
             // constructing property map for constructing rest webservice url
-            Map<String, String> propertiesMap = new HashMap<String, String>();
+            Map<String, String> propertiesMap = new HashMap<>();
             propertiesMap.put(VoyageConstants.VOYAGE_API_USER, user);
             propertiesMap.put(VoyageConstants.VOYAGE_API_USER_PASSWORD,
                     password);
@@ -268,7 +268,7 @@ public class VoyageApplicationUsersStepdefs {
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication
                         (authenticationJwtToken.getAccess_token());
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         try {
             responseEntityForUserRequest = restTemplateBuilder.build()
@@ -297,7 +297,7 @@ public class VoyageApplicationUsersStepdefs {
                 .VOYAGE_API_USERS_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(accessToken);
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         try {
             responseEntityUserList = restTemplateBuilder.build()
@@ -463,9 +463,8 @@ public class VoyageApplicationUsersStepdefs {
                     .build().exchange(serviceUrlForUsers, HttpMethod.POST,
                             httpEntity, String.class);
         } catch (RestClientException e) {
-            e.printStackTrace();
             responseEntityMissingRequiredParamUser = new
-                    ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+                    ResponseEntity<>(HttpStatus.BAD_REQUEST);
             Assert.assertTrue(e.getMessage().toString().trim()
                     .equals(HttpStatus.BAD_REQUEST.toString()));
             // not throwing the exception as its a negative testcase
@@ -497,7 +496,7 @@ public class VoyageApplicationUsersStepdefs {
         String deleteRecord = toBeDeletedRecord.substring(
                 toBeDeletedRecord.indexOf(BEGIN_INDEX_OF_COLON) + 1,
                 toBeDeletedRecord.indexOf(END_INDEX_DELETE_ID));
-        HttpEntity<Object> httpEntity = new HttpEntity<Object>(headers);
+        HttpEntity<Object> httpEntity = new HttpEntity<>(headers);
 
 
         serviceUrlForUsers += VoyageConstants.FORWARD_SLASH
@@ -513,7 +512,6 @@ public class VoyageApplicationUsersStepdefs {
             e.printStackTrace();
             Assert.fail();
             // not throwing the exception as its a negative testcase
-            return;
         }
     }
 
@@ -536,7 +534,7 @@ public class VoyageApplicationUsersStepdefs {
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication
                         (authenticationJwtToken.getAccess_token());
-        HttpEntity<?> httpEntity = new HttpEntity<Object>(headers);
+        HttpEntity<?> httpEntity = new HttpEntity<>(headers);
 
         try {
             responseEntityUserList = restTemplateBuilder.build()
@@ -547,7 +545,6 @@ public class VoyageApplicationUsersStepdefs {
         } catch (RestClientException e) {
             e.printStackTrace();
             Assert.fail();
-            return;
         }
     }
 
@@ -599,7 +596,7 @@ public class VoyageApplicationUsersStepdefs {
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication
                         (accessToken);
-        HttpEntity<?> httpEntity = new HttpEntity<Object>(headers);
+        HttpEntity<?> httpEntity = new HttpEntity<>(headers);
 
         try {
             responseEntityUserList = restTemplateBuilder.build()

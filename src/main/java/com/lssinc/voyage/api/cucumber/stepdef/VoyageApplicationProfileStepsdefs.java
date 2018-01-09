@@ -1,32 +1,29 @@
 /*
+ * Copyright 2017 Lighthouse Software, Inc.   http://www.LighthouseSoftware.com
  *
- *  * Copyright 2017 Lighthouse Software, Inc.   http://www.LighthouseSoftware.com
- *  *
- *  * Licensed to the Apache Software Foundation (ASF) under one or more
- *  * contributor license agreements.  See the NOTICE file distributed with
- *  * this work for additional information regarding copyright ownership.
- *  * The ASF licenses this file to You under the Apache License, Version 2.0
- *  * (the "License"); you may not use this file except in compliance with
- *  * the License.  You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package com.lssinc.voyage.api.cucumber.stepdef;
 
 import com.lssinc.voyage.api.cucumber.VoyageApiTestingCucumberApplication;
 import com.lssinc.voyage.api.cucumber.domain.AuthenticationJwtToken;
-import com.lssinc.voyage.api.cucumber.domain.User;
 import com.lssinc.voyage.api.cucumber.util.Utils;
 import com.lssinc.voyage.api.cucumber.util.VoyageConstants;
 import com.sun.glass.ui.Application;
-import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -41,20 +38,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.support.BasicAuthorizationInterceptor;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -83,16 +78,20 @@ public class VoyageApplicationProfileStepsdefs {
      */
     @Value("${voyagestepdef.clientidvalue}")
     private String user;
-
+    /**.
+     * user property loaded from properties file
+     */
+    @Value("${voyageapi.dotnet.username}")
+    private String userName;
     /**.
      * password property loaded from properties file
      */
-    @Value("${voyagestepdef.clientsecretvalue}")
+    @Value("${voyageapi.dotnet.password}")
     private String password;
     /**.
      * client id placeholder property loaded from properties file
      */
-    @Value("${voyagestepdef.clientidvalue}")
+    @Value("${voyagestepdef.clientid}")
     private String clientId;
 
     /**.
@@ -122,7 +121,7 @@ public class VoyageApplicationProfileStepsdefs {
     /**.
      * grant type property loaded from properties file
      */
-    @Value("${voyagestepdef.granttypevalue}")
+    @Value("${voyageapi.dotnet.granttypevalue}")
     private String grantTypeValue;
 
     /**.
@@ -134,7 +133,7 @@ public class VoyageApplicationProfileStepsdefs {
      * voyage api server url property loaded from properties file
      */
     @Value("${voyageapi.dotnet.serverurl}")
-    private String serverUrl;
+    private String authorizationdotnetUrl;
     /**.
      * voyage api server url property loaded from properties file
      */
@@ -161,33 +160,53 @@ public class VoyageApplicationProfileStepsdefs {
     @Autowired
     private RestTemplateBuilder restTemplateBuilder;
     /**
+     *  voyage api authorization url
+     */
+    @Value("${voyageapi.dotnet.authorizationurl}")
+    private String authorizationUrl;
+    /**
+     *  voyage api authorization path
+     */
+    @Value("${voyageapi.dotnet.clientsuper}")
+    private String clientSuper;
+    /**
+     *  voyage api authorization path
+     */
+    @Value("${voyageapi.dotnet.authorizationpath}")
+    private String authorizationPath;
+    /**
+     *  voyage api redirect url
+     */
+    @Value("${voyageapi.dotnet.redirecturl}")
+    private String redirectUrl;
+    /**
+     *  voyage api redirect url parameter
+     */
+    @Value("${voyageapi.dotnet.responsetype}")
+    private String responseType;
+    /**
+     *submitform
+     */
+    @Value("${voyageapi.dotnet.submitvoyageauthorizationform}")
+    private String submitVoyageAuthorizationForm;
+    /**.
+     * voyage api server url
+     */
+    @Value("${voyageapi.dotnet.serverurl}")
+    private String serverUrl;
+    /**
      * initializing variables and constructing the oauth2 url for auth token
      * generation
      * @throws Exception
      */
     @PostConstruct
     public void init() throws Exception {
+        // authorizationurl + authorizationpath + "?" + "client_id=" +
+        //        clientsuper +
+        // "&" + "redirect_uri=" + redirecturl +  redirectparam1
+        // +"response_type=" + responsetype;
         oAuthTokenUrl = serverUrl + serverOauthPath;
     }
-    /**
-     *  response {@link User} class
-     */
-    private static List<User> users;
-
-    /**
-     *  parameter error message
-     */
-    private static String HTTP_401_UNAUTHORIZED;
-    /**
-     * dynamically creating user names as the service doesn't accept duplicates
-     */
-    private static String usernameForInserting;
-    /**
-     * Response entity for missing parameters
-     */
-    private static ResponseEntity<String>
-            responseEntityMissingRequiredParamUser;
-
     /**.
      * @return RestTemplate
      */
@@ -202,42 +221,33 @@ public class VoyageApplicationProfileStepsdefs {
     private ResponseEntity getAuthToken() throws Exception {
         ResponseEntity<String> response = null;
         try {
-            // constructing property map for constructing rest webservice url
-            Map<String, String> propertiesMap = new HashMap<String, String>();
-            propertiesMap.put(VoyageConstants.VOYAGE_API_USER, user);
-            propertiesMap.put(VoyageConstants.VOYAGE_API_USER_PASSWORD,
+            // constructing property map for constructing parameters
+            MultiValueMap<String, String> propertiesMap =
+                    new LinkedMultiValueMap<>();
+            propertiesMap.add(grantType, grantTypeValue);
+            propertiesMap.add(VoyageConstants.VOYAGE_API_USER_NAME, userName);
+            propertiesMap.add(VoyageConstants.VOYAGE_API_USER_PASSWORD,
                     password);
-            propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_ID, clientId);
-            propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_ID_VALUE,
-                    clientIdValue);
-            propertiesMap.put(VoyageConstants.VOYAGE_API_USER_PASSWORD,
-                    clientSecret);
-            propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_SECRET,
-                    clientSecret);
-            propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_SECRET_VALUE,
-                    clientSecretValue);
-            propertiesMap.put(VoyageConstants.VOYAGE_API_GRANT_TYPE, grantType);
-            propertiesMap.put(VoyageConstants.VOYAGE_API_GRANT_TYPE_VALUE,
-                    grantTypeValue);
-            propertiesMap.put(VoyageConstants.REQUEST_SCOPE, "");
-            propertiesMap.put(VoyageConstants.VOYAGE_API_OAUTH_TOKEN_URL,
-                    oAuthTokenUrl);
+            propertiesMap.add(VoyageConstants.REQUEST_SCOPE, "");
+            propertiesMap.add(clientId, clientIdValue);
+            propertiesMap.add(clientSecret, clientSecretValue);
 
-            HttpEntity httpEntity =
-                    Utils.buildAuthTokenHeadersAndRequestBody(propertiesMap);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            HttpEntity<?> httpEntity = new HttpEntity<Object>(propertiesMap,
+                    headers);
 
             RestTemplate restTemplate = restTemplateBuilder.build();
-
-            restTemplate.getInterceptors().add(
-                    new BasicAuthorizationInterceptor(user, password));
             restTemplate.getMessageConverters().add(new
                     StringHttpMessageConverter());
             response =
                     restTemplate.exchange(oAuthTokenUrl, HttpMethod
                             .POST, httpEntity, String.class);
-            authenticationJwtToken = Utils.getAuthenticationJwtToken(response);
+            headers.setContentType(MediaType.TEXT_HTML);
+            authenticationJwtToken = Utils.getAuthenticationJwtToken
+                    (response);
         } catch (Exception e) {
-            e.printStackTrace();
+                e.printStackTrace();
             Assert.fail();
             throw e;
         }
@@ -259,7 +269,7 @@ public class VoyageApplicationProfileStepsdefs {
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication
                         (authenticationJwtToken.getAccess_token());
-        HttpEntity<Object> entity = new HttpEntity<Object>(headers);
+        HttpEntity<Object> entity = new HttpEntity<>(headers);
 
         try {
             responseEntityForProfileRequest = restTemplateBuilder.build()
@@ -268,20 +278,37 @@ public class VoyageApplicationProfileStepsdefs {
 
             Assert.assertNotNull(responseEntityForProfileRequest);
         } catch (RestClientException e) {
-            //Assert.fail();
+            Assert.fail();
             // not throwing the exception as its a negative testcase
         }
-        //Assert.assertNotNull(responseEntityForProfileRequest);
     }
 
     private String updateRequestBodyForUpdating() {
 
-        String body = "{ \"userName\": \"abc\", \"email\": \"abc@abc.com\", " +
-                "\"password\": \"abcD@1234\", \"confirmPassword\": " +
-                "\"abcD@1234\", \"firstName\": \"string\", \"lastName\": " +
-                "\"string\", \"phoneNumbers\": [ { \"id\": 0, \"userId\": " +
-                "\"1\", \"phoneNumber\": \"14155552671\", \"phoneType\": 0, " +
-                "\"verificationCode\": \"string\" }]}";
+        String body = "{\n"
+                      + "  \"roles\": [\n"
+                      + "    \"Administrator\",\n"
+                      + "    \"Basic\"\n"
+                      + "  ],\n"
+                      + "  \"profileImage\": null,\n"
+                      + "  \"id\": \"fb9f65d2-699c-4f08-a2e4-8e6c28190a84\",\n"
+                      + "  \"firstName\": \"Admin_First\",\n"
+                      + "  \"lastName\": \"Admin_Last\",\n"
+                      + "  \"username\": \"admin@admin.com\",\n"
+                      + "  \"email\": \"admin@admin.com\",\n"
+                      + "  \"phones\": [\n"
+                      + "    {\n"
+                      + "      \"id\": 1,\n"
+                      + "      \"userId\": "
+                      + "\"fb9f65d2-699c-4f08-a2e4-8e6c28190a84\",\n"
+                      + "      \"phoneNumber\": \"5417543010\",\n"
+                      + "      \"phoneType\": \"Home\",\n"
+                      + "      \"verificationCode\": null\n"
+                      + "    }\n"
+                      + "  ],\n"
+                      + "  \"isActive\": false,\n"
+                      + "  \"isVerifyRequired\": false\n"
+                      + "}";
         return body;
     }
 
@@ -289,13 +316,13 @@ public class VoyageApplicationProfileStepsdefs {
     public void iShouldObtainTheUserUserProfileDetails(String arg0) throws
                                                                Throwable {
         // need to implement this method after it is working on the server side
-        //Assert.assertNotNull(responseEntityForProfileRequest);
+        Assert.assertNotNull(responseEntityForProfileRequest);
     }
 
     @Then("^I should be able to submit users profile$")
     public void iShouldBeAbleToSubmitUsersProfile(String arg0) throws
                                                                Throwable {
-        String serviceUrlForPermissions = serverUrl + VoyageConstants
+        String serviceUrlForPermissions = serverUrlforApi + VoyageConstants
                 .FORWARD_SLASH + serverApiVersion
                 + VoyageConstants.VOYAGE_API_PROFILE_ME_PATH;
         HttpHeaders headers = Utils
@@ -303,12 +330,12 @@ public class VoyageApplicationProfileStepsdefs {
                         accessToken);
 
         String body =  updateRequestBodyForUpdating();
-        HttpEntity<Object> entity = new HttpEntity<Object>(body, headers);
+        HttpEntity<Object> entity = new HttpEntity<>(body, headers);
         try {
             responseEntityForProfileRequest =
                     restTemplateBuilder.build()
                             .exchange(serviceUrlForPermissions,
-                                    HttpMethod.POST, entity, String.class);
+                                    HttpMethod.PUT, entity, String.class);
 
         } catch (RestClientException e) {
             Assert.fail();
@@ -321,7 +348,13 @@ public class VoyageApplicationProfileStepsdefs {
 
     @When("^user submits for user profile \"([^\"]*)\"$")
     public void userSubmitsForUserProfile(String arg0) throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        //Assert.assertNotNull(responseEntityForProfileRequest);
+        Assert.assertNotNull(responseEntityForProfileRequest);
+    }
+
+    @Given("^I have a valid jwt token for user profile for submitting$")
+    public void iHaveAValidJwtTokenForUserProfileForSubmitting() throws
+                                                                 Throwable {
+        responseEntityForProfileRequest = getAuthToken();
+        Assert.assertNotNull(authenticationJwtToken.getAccess_token());
     }
 }

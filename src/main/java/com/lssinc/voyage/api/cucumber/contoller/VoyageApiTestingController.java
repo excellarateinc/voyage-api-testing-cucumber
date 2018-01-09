@@ -18,7 +18,6 @@
  */
 package com.lssinc.voyage.api.cucumber.contoller;
 
-import com.lssinc.voyage.api.cucumber.CucumberRunner;
 import com.lssinc.voyage.api.cucumber.service.CucumberRunnerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,12 +40,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @RequestMapping("/api/v1")
 @EnableWebMvc
 public class VoyageApiTestingController {
-
-    /**.
-     * cucumber runner
-     */
-    @Autowired
-    private CucumberRunner runner;
 
     /**.
      * Rest template used to call rest services from Voyage API
@@ -92,7 +85,7 @@ public class VoyageApiTestingController {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.TEXT_HTML);
             //set response entity
-            HttpEntity<Object> entity = new HttpEntity<Object>(headers);
+            HttpEntity<Object> entity = new HttpEntity<>(headers);
             ResponseEntity<String> responseEntity =
              restTemplateBuilder.build().exchange(reportsUrl, HttpMethod.GET,
                      entity, String.class);

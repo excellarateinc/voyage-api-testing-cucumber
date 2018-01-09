@@ -57,6 +57,10 @@ public class VoyageConstants {
      */
     public static final String VOYAGE_API_USER = "user";
     /**.
+     * user name header constant
+     */
+    public static final String VOYAGE_API_USER_NAME = "username";
+    /**.
      * password header constant
      */
     public static final String VOYAGE_API_USER_PASSWORD = "password";
@@ -105,5 +109,4 @@ public class VoyageConstants {
      * voyage constants profile api path
      */
     public static final String VOYAGE_API_PROFILE_ME_PATH = "profiles/me";
-
 }

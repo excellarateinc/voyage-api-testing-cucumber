@@ -12,7 +12,7 @@ Feature: Feature Users
     """
 
   Scenario: submit user profile information
-    Given I have a valid jwt token for user profile
+    Given I have a valid jwt token for user profile for submitting
     When user submits for user profile "http://localhost:8080/api/v1/profiles/me"
     Then I should be able to submit users profile
     """
