@@ -27,6 +27,7 @@ import com.sun.glass.ui.Application;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import cucumber.api.java8.En;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -51,10 +53,9 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 
-
 /**
  * .
- * voyage api authentication token integration test
+ * voyage accounts api integration test
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = VoyageApiTestingCucumberApplication.class,
@@ -62,13 +63,13 @@ import javax.annotation.PostConstruct;
 @WebAppConfiguration
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest
         .WebEnvironment.RANDOM_PORT)
-public class VoyageApplicationProfileStepsdefs {
+public class VoyageApplicationAccountsStepdefs implements En {
     /**
      * .
      * stores the response entity for user request test case, it will be used
      * in the next test case
      */
-    private ResponseEntity<String> responseEntityForProfileRequest = null;
+    private ResponseEntity<String> responseEntityForAccountsRequest = null;
     /**
      * Authentication token of voyage application
      */
@@ -217,16 +218,7 @@ public class VoyageApplicationProfileStepsdefs {
     private ResponseEntity getAuthToken() throws Exception {
         ResponseEntity<String> response = null;
         try {
-            // constructing property map for constructing parameters
-            MultiValueMap<String, String> propertiesMap =
-                    new LinkedMultiValueMap<>();
-            propertiesMap.add(grantType, grantTypeValue);
-            propertiesMap.add(VoyageConstants.VOYAGE_API_USER_NAME, userName);
-            propertiesMap.add(VoyageConstants.VOYAGE_API_USER_PASSWORD,
-                    password);
-            propertiesMap.add(VoyageConstants.REQUEST_SCOPE, "");
-            propertiesMap.add(clientId, clientIdValue);
-            propertiesMap.add(clientSecret, clientSecretValue);
+            MultiValueMap<String, String> propertiesMap = getParametersMap();
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -243,114 +235,95 @@ public class VoyageApplicationProfileStepsdefs {
             authenticationJwtToken = Utils.getAuthenticationJwtToken
                     (response);
         } catch (Exception e) {
-                e.printStackTrace();
+            e.printStackTrace();
             Assert.fail();
             throw e;
         }
         return response;
     }
 
-     @Given("^I have a valid jwt token for user profile$")
-    public void iHaveAValidJwtTokenForUserProfile() throws Throwable {
-        getAuthToken();
+    /**
+     * returns the parameters required for the web service call
+     * @return
+     */
+    private MultiValueMap<String, String> getParametersMap() {
+        // constructing property map for constructing parameters
+        MultiValueMap<String, String> propertiesMap =
+                new LinkedMultiValueMap<>();
+        propertiesMap.add(grantType, grantTypeValue);
+        propertiesMap.add(VoyageConstants.VOYAGE_API_USER_NAME, userName);
+        propertiesMap.add(VoyageConstants.VOYAGE_API_USER_PASSWORD,
+                password);
+        propertiesMap.add(VoyageConstants.REQUEST_SCOPE, "");
+        propertiesMap.add(clientId, clientIdValue);
+        propertiesMap.add(clientSecret, clientSecretValue);
+        return propertiesMap;
+    }
+
+
+    @Given("^I have a valid jwt token for account submission$")
+    public void iHaveAValidJwtTokenForAccountSubmission() throws Throwable {
+        responseEntityForAccountsRequest = getAuthToken();
+        Assert.assertNotNull(responseEntityForAccountsRequest);
         Assert.assertNotNull(authenticationJwtToken.getAccess_token());
+
     }
 
-    @When("^user requests for user profile \"([^\"]*)\"$")
-    public void userRequestsForUserProfile(String arg0) throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        String serviceUrlForUsers = serverUrlforApi + VoyageConstants
-                .FORWARD_SLASH + serverApiVersion + VoyageConstants
-                .VOYAGE_API_PROFILE_ME_PATH;
-        HttpHeaders headers = Utils
-                .buildBasicHttpHeadersForBearerAuthentication
-                        (authenticationJwtToken.getAccess_token());
-        HttpEntity<Object> entity = new HttpEntity<>(headers);
-
-        try {
-            responseEntityForProfileRequest = restTemplateBuilder.build()
-                    .exchange(serviceUrlForUsers, HttpMethod.GET, entity,
-                            String.class);
-
-            Assert.assertNotNull(responseEntityForProfileRequest);
-        } catch (RestClientException e) {
-            Assert.fail();
-            // not throwing the exception as its a negative testcase
-        }
-    }
-
-    private String updateRequestBodyForUpdating() {
-
-        String body = "{\n"
-                      + "  \"roles\": [\n"
-                      + "    \"Administrator\",\n"
-                      + "    \"Basic\"\n"
-                      + "  ],\n"
-                      + "  \"profileImage\": null,\n"
-                      + "  \"id\": \"fb9f65d2-699c-4f08-a2e4-8e6c28190a84\",\n"
-                      + "  \"firstName\": \"Admin_First\",\n"
-                      + "  \"lastName\": \"Admin_Last\",\n"
-                      + "  \"username\": \"admin@admin.com\",\n"
-                      + "  \"email\": \"admin@admin.com\",\n"
-                      + "  \"phones\": [\n"
-                      + "    {\n"
-                      + "      \"id\": 1,\n"
-                      + "      \"userId\": "
-                      + "\"fb9f65d2-699c-4f08-a2e4-8e6c28190a84\",\n"
-                      + "      \"phoneNumber\": \"5417543010\",\n"
-                      + "      \"phoneType\": \"Home\",\n"
-                      + "      \"verificationCode\": null\n"
-                      + "    }\n"
-                      + "  ],\n"
-                      + "  \"isActive\": false,\n"
-                      + "  \"isVerifyRequired\": false\n"
-                      + "}";
-        return body;
-    }
-
-    @Then("^I should obtain the user user profile details$")
-    public void iShouldObtainTheUserUserProfileDetails(String arg0) throws
-                                                               Throwable {
-        // need to implement this method after it is working on the server side
-        Assert.assertNotNull(responseEntityForProfileRequest);
-    }
-
-    @Then("^I should be able to submit users profile$")
-    public void iShouldBeAbleToSubmitUsersProfile(String arg0) throws
-                                                               Throwable {
+    @When("^user requests for account submission \"([^\"]*)\"$")
+    public void userRequestsForAccountSubmission(String arg0) throws Throwable {
         String serviceUrlForPermissions = serverUrlforApi + VoyageConstants
                 .FORWARD_SLASH + serverApiVersion
-                + VoyageConstants.VOYAGE_API_PROFILE_ME_PATH;
+                + VoyageConstants.VOYAGE_API_ACCOUNTS_PATH;
         HttpHeaders headers = Utils
                 .buildBasicHttpHeadersForBearerAuthentication(
                         accessToken);
-
-        String body =  updateRequestBodyForUpdating();
+        int randomNumber = Utils.getRandomNumber();
+        String usernameForInserting = "FirstName" + randomNumber + "@app.com";
+        String body =  updateRequestBodyForUpdating(usernameForInserting);
         HttpEntity<Object> entity = new HttpEntity<>(body, headers);
         try {
-            responseEntityForProfileRequest =
+            responseEntityForAccountsRequest =
                     restTemplateBuilder.build()
                             .exchange(serviceUrlForPermissions,
-                                    HttpMethod.PUT, entity, String.class);
+                                    HttpMethod.POST, entity, String.class);
 
         } catch (RestClientException e) {
             Assert.fail();
             return;
             // not throwing the exception as its a negative testcase
         }
-        Assert.assertNotNull(responseEntityForProfileRequest);
+        Assert.assertNotNull(responseEntityForAccountsRequest);
     }
 
-
-    @When("^user submits for user profile \"([^\"]*)\"$")
-    public void userSubmitsForUserProfile(String arg0) throws Throwable {
-        Assert.assertNotNull(responseEntityForProfileRequest);
+    /**
+     * returns the json request for inserting an account
+     * @param usernameForInserting
+     * @return
+     */
+    private String updateRequestBodyForUpdating(String usernameForInserting) {
+        return "{\n"
+               + "  \"userName\": " + "\""  + usernameForInserting + "\",\n"
+               + "  \"email\": " + "\""  + usernameForInserting + "\",\n"
+               + "  \"password\": \"abcD@1234\",\n"
+               + "  \"confirmPassword\": \"abcD@1234\",\n"
+               + "  \"firstName\": \"string\",\n"
+               + "  \"lastName\": \"string\",\n"
+               + "  \"phoneNumbers\": [\n"
+               + "    {\n"
+               + "      \"id\": 0,\n"
+               + "      \"userId\": \"1\",\n"
+               + "      \"phoneNumber\": \"14155552671\",\n"
+               + "      \"phoneType\": 0,\n"
+               + "      \"verificationCode\": \"string\"\n"
+               + "    }\n"
+               + "  ]\n"
+               + "}";
     }
 
-    @Given("^I have a valid jwt token for user profile for submitting$")
-    public void iHaveAValidJwtTokenForUserProfileForSubmitting() throws
-                                                                 Throwable {
-        responseEntityForProfileRequest = getAuthToken();
-        Assert.assertNotNull(authenticationJwtToken.getAccess_token());
+    @Then("^I should submit account information$")
+    public void iShouldSubmitAccountInformation(String arg0) throws Throwable {
+        Assert.assertNotNull(responseEntityForAccountsRequest);
+        Assert.assertTrue(HttpStatus.CREATED
+                          == responseEntityForAccountsRequest.getStatusCode());
     }
 }

@@ -55,7 +55,7 @@ public class Utils {
     /**
      * max random number to insert the user name
      */
-    public static final int MAX_RANDOM_NUMBER = 1000;
+    public static final int MAX_RANDOM_NUMBER = 100000;
 
     /**
      * .

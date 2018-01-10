@@ -109,4 +109,8 @@ public class VoyageConstants {
      * voyage constants profile api path
      */
     public static final String VOYAGE_API_PROFILE_ME_PATH = "profiles/me";
+    /**
+     * voyage constants accounts api path
+     */
+    public static final String VOYAGE_API_ACCOUNTS_PATH = "accounts";
 }

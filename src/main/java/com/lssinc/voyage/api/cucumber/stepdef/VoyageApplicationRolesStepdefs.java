@@ -191,25 +191,7 @@ public class VoyageApplicationRolesStepdefs {
         ResponseEntity<String> response = null;
         try {
             // constructing property map for constructing rest webservice url
-            Map<String, String> propertiesMap = new HashMap<>();
-            propertiesMap.put(VoyageConstants.VOYAGE_API_USER, user);
-            propertiesMap.put(VoyageConstants.VOYAGE_API_USER_PASSWORD,
-                    password);
-            propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_ID, clientId);
-            propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_ID_VALUE,
-                    clientIdValue);
-            propertiesMap.put(VoyageConstants.VOYAGE_API_USER_PASSWORD,
-                    clientSecret);
-            propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_SECRET,
-                    clientSecret);
-            propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_SECRET_VALUE,
-                    clientSecretValue);
-            propertiesMap.put(VoyageConstants.VOYAGE_API_GRANT_TYPE, grantType);
-            propertiesMap.put(VoyageConstants.VOYAGE_API_GRANT_TYPE_VALUE,
-                    grantTypeValue);
-            propertiesMap.put(VoyageConstants.REQUEST_SCOPE, "");
-            propertiesMap.put(VoyageConstants.VOYAGE_API_OAUTH_TOKEN_URL,
-                    oAuthTokenUrl);
+            Map<String, String> propertiesMap = getParametersMap();
 
             HttpEntity httpEntity =
                     Utils.buildAuthTokenHeadersAndRequestBody(propertiesMap);
@@ -230,6 +212,33 @@ public class VoyageApplicationRolesStepdefs {
             throw e;
         }
         return response;
+    }
+
+    /**
+     *  returns the parameters map those needs to be passed through request
+     * @return
+     */
+    private Map<String, String> getParametersMap() {
+        Map<String, String> propertiesMap = new HashMap<>();
+        propertiesMap.put(VoyageConstants.VOYAGE_API_USER, user);
+        propertiesMap.put(VoyageConstants.VOYAGE_API_USER_PASSWORD,
+                password);
+        propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_ID, clientId);
+        propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_ID_VALUE,
+                clientIdValue);
+        propertiesMap.put(VoyageConstants.VOYAGE_API_USER_PASSWORD,
+                clientSecret);
+        propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_SECRET,
+                clientSecret);
+        propertiesMap.put(VoyageConstants.VOYAGE_API_CLIENT_SECRET_VALUE,
+                clientSecretValue);
+        propertiesMap.put(VoyageConstants.VOYAGE_API_GRANT_TYPE, grantType);
+        propertiesMap.put(VoyageConstants.VOYAGE_API_GRANT_TYPE_VALUE,
+                grantTypeValue);
+        propertiesMap.put(VoyageConstants.REQUEST_SCOPE, "");
+        propertiesMap.put(VoyageConstants.VOYAGE_API_OAUTH_TOKEN_URL,
+                oAuthTokenUrl);
+        return propertiesMap;
     }
 
 
